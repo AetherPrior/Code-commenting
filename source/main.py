@@ -1,13 +1,11 @@
 from vocab2dict import VocabData
 from encoder import Encoder
-
 from config import *
-import tensorflow as tf
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 from tensorflow.data import Dataset
+from tensorflow import convert_to_tensor
 
 input_path = "./Dataset/data_RQ1/train/train.token.code"
-
 vocab_size = None
 
 
@@ -40,7 +38,7 @@ def get_batch(batch_sz):
 
 def main():
     batch_sz = 128
-    batch = tf.convert_to_tensor(pad_sequences(get_batch(batch_sz)))
+    batch = convert_to_tensor(pad_sequences(get_batch(batch_sz)))
     encoder = Encoder(vocab_size=vocab_size,
                       batch_sz=batch_sz,
                       embedding_dim=1024,

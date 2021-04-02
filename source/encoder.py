@@ -8,11 +8,11 @@ class Encoder(Model):
         self.batch_sz = batch_sz
         self.enc_units = enc_units
         self.embedding = Embedding(vocab_size, embedding_dim)
-        self.lstm = LSTM(self.enc_units, return_sequences=True,
-                         return_state=True, stateful=False)
+        self.lstm = LSTM(self.enc_units,
+                         return_sequences=True,
+                         return_state=True)
 
     def call(self, x):
         x = self.embedding(x)
-        # output, state_h, state_c
         output, _, state = self.lstm(x)
         return output, state
