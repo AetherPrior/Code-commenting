@@ -1,14 +1,15 @@
-import tensorflow as tf
+from tensorflow.keras import Model
+from tensorflow.keras.layers import Embedding, LSTM
 
 
-class Encoder(tf.keras.Model):
+class Encoder(Model):
     def __init__(self, vocab_size, embedding_dim, enc_units, batch_sz):
         super(Encoder, self).__init__()
         self.batch_sz = batch_sz
         self.enc_units = enc_units
-        self.embedding = tf.keras.layers.Embedding(vocab_size, embedding_dim)
-        self.lstm = tf.keras.layers.LSTM(
-            self.enc_units, return_sequences=True, return_state=True, stateful=False)
+        self.embedding = Embedding(vocab_size, embedding_dim)
+        self.lstm = LSTM(self.enc_units, return_sequences=True,
+                         return_state=True, stateful=False)
 
     def call(self, x):
         x = self.embedding(x)
