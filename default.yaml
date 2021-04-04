@@ -1,0 +1,40 @@
+# Nadam parameters
+learning_rate: 0.01
+beta_1: 0.9
+beta_2: 0.999
+clip_norm: 5.0
+
+# batch iteration parameters:
+batch_size: 128
+batch_mode: standard
+shuffle: True
+read_ahead: 1     
+reverse_input: True  
+
+# encoder parameters:
+cell_type: LSTM
+units: 1024
+stateful: False
+encoder_embedding_dim: 512
+dropout: 0.0
+recurrent_dropout: 0.0
+
+# decoder parameters:
+cell_type: LSTM
+units: 1024
+stateful: False
+decoder_embedding_dim: 512
+dropout: 0.0
+recurrent_dropout: 0.0
+
+# attention parameters:
+units: 1024
+style: Bahdanau
+
+# loss parameters:
+covloss_regularizer: 0.5
+score_function: nltk_sentence_bleu
+beam_size: 5
+early_stopping: True
+len_normalization: 1.0
+remove_unk: False
