@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-nmt_with_coverage_attention
+encoder_with_coverage_attention
 Borrowed from OpenNMT 
 """
 
@@ -68,7 +68,7 @@ def train_step(inp, targ):
 
         for t in range(1, targ.shape[1]):
             predictions, dec_hidden, attention_weights, coverage_vector = decoder(
-                dec_input, dec_hidden, enc_output)
+                dec_input, enc_output)
             loss += loss_function(targ[:, t], predictions,
                                   attention_weights, coverage_vector)
             dec_input = tf.expand_dims(targ[:, t], 1)
