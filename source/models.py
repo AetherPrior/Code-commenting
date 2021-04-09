@@ -26,10 +26,14 @@ class BiEncoder(Model):
 
 
 class BahdanauAttention(Layer):
-    def __init__(self, enc_out_shape):
+    def __init__(self, batch_sz, attn_sz):
+        '''
+            batch_sz = enc_out_shape[0]
+            attn_sz = enc_out_shape[2], the encoder units
+        '''
         super(BahdanauAttention, self).__init__()
-        self.batch_sz = enc_out_shape[0]
-        self.attn_sz = enc_out_shape[2]
+        self.batch_sz = batch_sz
+        self.attn_sz = attn_sz
 
         self.W_h = Conv2D(filters=self.attn_sz, kernel_size=1, padding="same")
         self.W_c = Conv2D(filters=self.attn_sz, kernel_size=1, padding="same")
@@ -55,8 +59,14 @@ class BahdanauAttention(Layer):
 
         else:
             cov_features = self.W_c(coverage)
-            a_t = softmax(tf.reduce_sum(
-                self.V(tanh(enc_features + dec_features + cov_features)), axis=[2, 3]))
+            a_t = softmax(
+                tf.reduce_sum(
+                    self.V(
+                        tanh(enc_features + dec_features + cov_features)),
+                    axis=[2, 3]
+                )
+            )
+
             coverage += tf.reshape(a_t, [self.batch_sz, -1, 1, 1])
 
         context_vector = tf.reduce_sum(tf.reshape(
@@ -68,12 +78,13 @@ class BahdanauAttention(Layer):
 
 
 class AttentionDecoder(Model):
-    def __init__(self, attn_shape, inp_dim, out_dim, embed_dim=1024, dec_units=1024):
+    def __init__(self, batch_sz, inp_dim, out_dim, embed_dim=1024, dec_units=1024):
         '''
         attn_shape is same as enc_out_shape: h_i shape
         '''
         super(AttentionDecoder, self).__init__()
-        self.attention = BahdanauAttention(attn_shape)
+        self.attention = BahdanauAttention(
+            batch_sz=batch_sz, attn_sz=dec_units)
         self.embedding = Embedding(inp_dim, embed_dim)
         self.lstm = LSTM(dec_units, return_state=True)
 
@@ -92,6 +103,8 @@ class AttentionDecoder(Model):
             context_vector = self.prev_context_vector
 
         x = self.embedding(x)
+
+        print(x.shape, context_vector.shape)
 
         x = self.W2(
             tf.concat([x, tf.expand_dims(context_vector, axis=1)], axis=1))

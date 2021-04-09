@@ -4,7 +4,9 @@ import config
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 from tensorflow.data import Dataset
 from tensorflow import Tensor, convert_to_tensor
+import tensorflow as tf
 import numpy as np
+from loss import coverage_loss
 
 input_path_code = "./Dataset/data_RQ1/train/train.token.code"
 input_path_nl = "./Dataset/data_RQ1/train/train.token.nl"
@@ -43,37 +45,56 @@ def preprocess_code(input_path, vocab_size_code):
 
 
 def get_batch(batch_sz):
-    batch = []
-    gen = preprocess_code(input_path_code, vocab_size_code)
+    batch_code, batch_nl = [], []
+
+    gen_code, gen_nl = (preprocess_code(input_path_code, vocab_size_code),
+                        preprocess_nl(input_path_nl, vocab_size_nl))
+
     try:
         for i in range(batch_sz):
-            batch.append(next(gen))
+            batch_code.append(next(gen_code))
+            batch_nl.append(next(gen_nl))
+
     except StopIteration:
         print("Max Size Reached")
 
     # gen2 = preprocess_nl(input_path_nl, vocab_size_nl)
-    return batch
+    return convert_to_tensor(pad_sequences(batch_code)), convert_to_tensor(pad_sequences(batch_nl))
 
 
 def main():
     batch_sz = 8
-    batch = convert_to_tensor(pad_sequences(get_batch(batch_sz)))
-    print(batch.shape)
+
+    # print(batch.shape)
 
     encoder = BiEncoder(inp_dim=vocab_size_code+1)
 
-    hidden_state, cell_state = encoder(batch)
-
-    print(hidden_state.shape)
+    # print(hidden_state.shape)
 
     decoder = AttentionDecoder(
-        attn_shape=hidden_state.shape,
+        batch_sz=batch_sz,
         inp_dim=(vocab_size_nl+1),
         out_dim=(vocab_size_nl+1)
     )
 
-    x = convert_to_tensor(np.zeros((batch_sz, vocab_size_nl+1)))
-    decoder(x, h_i=hidden_state, state_c=cell_state)
+    @tf.function
+    def train_step(batch, target):
+        hidden_state, cell_state = encoder(batch)
+        coverage = None
+
+        for i in range(1, target.shape[1]):
+            # teacher-forcing
+            cell_state, p_vocab, p_gen, attn_dist, coverage = decoder(
+                tf.expand_dims(target[i], axis=1), hidden_state, cell_state, coverage)
+
+            p_vocab = p_gen*p_vocab
+            p_oov = (1-p_gen)*attn_dist
+
+    for i in range(3):
+        batch, target = get_batch(batch_sz)
+        train_step(batch, target)
+    #x = convert_to_tensor(np.zeros((batch_sz, vocab_size_nl+1)))
+    #decoder(x, h_i=hidden_state, state_c=cell_state)
 
 
 if __name__ == '__main__':
