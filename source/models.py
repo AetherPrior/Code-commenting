@@ -1,11 +1,11 @@
 import tensorflow as tf
 from tensorflow.keras.models import Model
 from tensorflow.nn import sigmoid, tanh, softmax
-from tensorflow.keras.layers import Bidirectional, LSTM, Dense, Embedding, Conv2D
+from tensorflow.keras.layers import Bidirectional, LSTM, Dense, Embedding, Conv2D, Layer
 
 
 class BiEncoder(Model):
-    def __init__(self, enc_inp_shape, inp_dim, embed_dim=1024, enc_units=1024):
+    def __init__(self, inp_dim, embed_dim=512, enc_units=512):
         '''
         Perferable to have a BiLSTM
         h_i - hidden vectors
@@ -13,14 +13,16 @@ class BiEncoder(Model):
         '''
         super(BiEncoder, self).__init__()
 
-        self.embedding = Embedding()
+        self.embedding = Embedding(input_dim=inp_dim, output_dim=embed_dim)
         self.lstm = LSTM(enc_units, return_state=True, return_sequences=True)
         self.bilstm = Bidirectional(self.lstm, merge_mode="concat")
 
     def call(self, x):
         x = self.embedding(x)
-        h_i, _, state_c = self.bilstm(x)
-        return (h_i, state_c)
+        enc_output, forward_h, forward_c, backward_h, backward_c = self.bilstm(
+            x)
+        state_c = tf.concat([forward_c, backward_c], axis=-1)
+        return (enc_output, state_c)
 
 
 class BahdanauAttention(Layer):
@@ -48,7 +50,7 @@ class BahdanauAttention(Layer):
 
         if coverage is None:
             a_t = softmax(tf.reduce_sum(
-                self.v(tanh(enc_features + dec_features)), axis=[2, 3]))
+                self.V(tanh(enc_features + dec_features)), axis=[2, 3]))
             coverage = tf.expand_dims(tf.expand_dims(a_t, 2), 2)
 
         else:
@@ -68,7 +70,7 @@ class BahdanauAttention(Layer):
 class AttentionDecoder(Model):
     def __init__(self, attn_shape, inp_dim, out_dim, embed_dim=1024, dec_units=1024):
         '''
-        attn_shape is same as enc_out_shape
+        attn_shape is same as enc_out_shape: h_i shape
         '''
         super(AttentionDecoder, self).__init__()
         self.attention = BahdanauAttention(attn_shape)
@@ -108,7 +110,7 @@ class AttentionDecoder(Model):
         temp = tf.concat([context_vector, state_c, tf.reshape(
             x, (-1, x.shape[1]*x.shape[2]))], axis=-1)
 
-        # embed the concatenated vectors
+        # embed the concatenated vectors as the p_gen
         p_gen = sigmoid(self.W1(temp))
 
         # reset context vector

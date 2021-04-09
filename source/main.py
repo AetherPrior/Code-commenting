@@ -1,18 +1,20 @@
 from vocab2dict import VocabData
-from encoder import Encoder
+from models import BiEncoder, BahdanauAttention, AttentionDecoder
 import config
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 from tensorflow.data import Dataset
-from tensorflow import convert_to_tensor
+from tensorflow import Tensor, convert_to_tensor
+import numpy as np
 
 input_path_code = "./Dataset/data_RQ1/train/train.token.code"
 input_path_nl = "./Dataset/data_RQ1/train/train.token.nl"
-vocab_size_code = vocab_size_nl = None
+vocab_size_code = 30000
+vocab_size_nl = 30000
 
 
 def preprocess_nl(input_path, vocab_size_nl):
-    vocab = VocabData(config.CODE_VOCAB)
-    vocab_size_code = len(vocab.vocab_dict)
+    vocab = VocabData(config.NL_VOCAB)
+    vocab_size_nl = len(vocab.vocab_dict)
 
     with open(input_path, 'r') as input_file:
         for nl_line in input_file.readlines():
@@ -48,21 +50,30 @@ def get_batch(batch_sz):
             batch.append(next(gen))
     except StopIteration:
         print("Max Size Reached")
+
+    # gen2 = preprocess_nl(input_path_nl, vocab_size_nl)
     return batch
 
 
 def main():
-    batch_sz = 128
+    batch_sz = 8
     batch = convert_to_tensor(pad_sequences(get_batch(batch_sz)))
-    encoder = Encoder(vocab_size=vocab_size,
-                      batch_sz=batch_sz,
-                      embedding_dim=1024,
-                      enc_units=1024)
+    print(batch.shape)
 
-    output, state = encoder(batch)
-    decoder = Decoder(
+    encoder = BiEncoder(inp_dim=vocab_size_code+1)
 
+    hidden_state, cell_state = encoder(batch)
+
+    print(hidden_state.shape)
+
+    decoder = AttentionDecoder(
+        attn_shape=hidden_state.shape,
+        inp_dim=(vocab_size_nl+1),
+        out_dim=(vocab_size_nl+1)
     )
+
+    x = convert_to_tensor(np.zeros((batch_sz, vocab_size_nl+1)))
+    decoder(x, h_i=hidden_state, state_c=cell_state)
 
 
 if __name__ == '__main__':
