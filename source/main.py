@@ -1,4 +1,3 @@
-import sys
 import config
 import numpy as np
 import tensorflow as tf
@@ -88,28 +87,26 @@ def main():
 
             hidden_state = tf.concat([hidden_state_code, hidden_state_ast], axis=-1)
             cell_state = tf.concat([cell_state_code, cell_state_ast], axis=-1)
-
-            print(hidden_state.shape, cell_state.shape)
             
-            dec_inp = tf.expand_dims([config.BOS] * batch_sz, axis=1)
             coverage = None
 
             for i in range(1, target.shape[1]):
-                # teacher-forcing during training.
-                # this means, pass the true output instead of the 
-                # previous output to the decoder.
+                dec_inp = ([config.BOS] * batch_sz) if (i == 1) else targ
+                dec_inp = tf.expand_dims(dec_inp, axis=1)
                 cell_state, p_vocab, p_gen, attn_dist, coverage = decoder(
                     dec_inp, hidden_state, cell_state, coverage)
 
+                targ = target[:, i]
                 p_vocab = p_gen*p_vocab
                 p_attn = (1-p_gen)*attn_dist
-                dec_inp = tf.expand_dims(target[:, i], 1)
-                loss_value = coverage_loss(target[:, i], p_vocab, attn_dist, coverage)
+                loss_value = coverage_loss(targ, p_vocab, attn_dist, coverage)
                 total_loss += loss_value
+            
             batch_loss = total_loss / int(target.shape[1])
             trainable_var = encoder_ast.trainable_variables + \
                             encoder_code.trainable_variables + \
                             decoder.trainable_variables
+            
             print("computing gradients")
             grads = tape.gradient(total_loss, trainable_var)
             print("applying gradients")
