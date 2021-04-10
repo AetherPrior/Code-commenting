@@ -5,7 +5,11 @@ from tensorflow.keras.layers import Bidirectional, LSTM, Dense, Embedding, Conv2
 
 
 class BiEncoder(Model):
-    def __init__(self, inp_dim, embed_dim=512, enc_units=512):
+    def __init__(self, inp_dim, 
+                 embed_dim=512, 
+                 enc_units=512, 
+                 dropout=0.25, 
+                 recurrent_dropout=0.1):
         '''
         Perferable to have a BiLSTM
         h_i - hidden vectors
@@ -13,14 +17,19 @@ class BiEncoder(Model):
         '''
         super(BiEncoder, self).__init__()
 
-        self.embedding = Embedding(input_dim=inp_dim, output_dim=embed_dim)
-        self.lstm = LSTM(enc_units, return_state=True, return_sequences=True)
-        self.bilstm = Bidirectional(self.lstm, merge_mode="concat")
+        self.embedding = Embedding(input_dim=inp_dim, 
+                                   output_dim=embed_dim)
+        self.lstm = LSTM(enc_units, 
+                         return_state=True, 
+                         return_sequences=True, 
+                         dropout=dropout, 
+                         recurrent_dropout=recurrent_dropout)
+        self.lstm = Bidirectional(self.lstm, 
+                                  merge_mode="concat")
 
     def call(self, x):
         x = self.embedding(x)
-        enc_output, forward_h, forward_c, backward_h, backward_c = self.bilstm(
-            x)
+        enc_output, _, forward_c, _, backward_c = self.lstm(x)
         state_c = tf.concat([forward_c, backward_c], axis=-1)
         return (enc_output, state_c)
 
@@ -35,8 +44,12 @@ class BahdanauAttention(Layer):
         self.batch_sz = batch_sz
         self.attn_sz = attn_sz
 
-        self.W_h = Conv2D(filters=self.attn_sz, kernel_size=1, padding="same")
-        self.W_c = Conv2D(filters=self.attn_sz, kernel_size=1, padding="same")
+        self.W_h = Conv2D(filters=self.attn_sz, 
+                          kernel_size=1, 
+                          padding="same")
+        self.W_c = Conv2D(filters=self.attn_sz, 
+                          kernel_size=1, 
+                          padding="same")
         self.W_s = Dense(self.attn_sz)
         self.V = Dense(self.attn_sz, use_bias=False)
 
@@ -78,7 +91,11 @@ class BahdanauAttention(Layer):
 
 
 class AttentionDecoder(Model):
-    def __init__(self, batch_sz, inp_dim, out_dim, embed_dim=1024, dec_units=1024):
+    def __init__(self, batch_sz, inp_dim, out_dim, 
+                 embed_dim=1024, 
+                 dec_units=1024, 
+                 dropout=0.25, 
+                 recurrent_dropout=0.1):
         '''
         attn_shape is same as enc_out_shape: h_i shape
         '''
@@ -86,7 +103,10 @@ class AttentionDecoder(Model):
         self.attention = BahdanauAttention(
             batch_sz=batch_sz, attn_sz=dec_units)
         self.embedding = Embedding(inp_dim, embed_dim)
-        self.lstm = LSTM(dec_units, return_state=True)
+        self.lstm = LSTM(dec_units, 
+                         return_state=True, 
+                         dropout=dropout, 
+                         recurrent_dropout=recurrent_dropout)
 
         self.W1 = Dense(1)
         self.W2 = Dense(dec_units)
@@ -103,8 +123,6 @@ class AttentionDecoder(Model):
             context_vector = self.prev_context_vector
 
         x = self.embedding(x)
-
-        print(x.shape, context_vector.shape)
 
         x = self.W2(
             tf.concat([x, tf.expand_dims(context_vector, axis=1)], axis=1))
@@ -126,7 +144,7 @@ class AttentionDecoder(Model):
         # embed the concatenated vectors as the p_gen
         p_gen = sigmoid(self.W1(temp))
 
-        # reset context vector
+        # cache context vector
         self.prev_context_vector = context_vector
 
         return (state_c, p_vocab, p_gen, attn_dist, coverage)

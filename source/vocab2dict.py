@@ -8,10 +8,3 @@ class VocabData:
             data = content_file.read().split('\n')
             content_file.close()
         self.vocab_dict = {k: v for (v, k) in enumerate(data)}
-
-    def add_pointer(self, sentence):
-        '''
-        tokenize the sentence
-        then add their words to the vocab dict
-        '''
-        pass

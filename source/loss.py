@@ -6,4 +6,4 @@ def coverage_loss(targets, predictions, attention_weights, coverage_vector, cove
         reduction=tf.keras.losses.Reduction.SUM)
     covloss = tf.reduce_sum(tf.minimum(
         coverage_vector, attention_weights), axis=1)
-    return loss_object(targets, predictions) + coverage_lambda*(covloss)
+    return loss_object(targets, predictions) + coverage_lambda*covloss
