@@ -91,8 +91,7 @@ def main():
             coverage = None
 
             for i in range(1, target.shape[1]):
-                dec_inp = ([config.BOS] * batch_sz) if (i == 1) else targ
-                dec_inp = tf.expand_dims(dec_inp, axis=1)
+                dec_inp = tf.expand_dims((([config.BOS] * batch_sz) if (i == 1) else targ), axis=1)
                 cell_state, p_vocab, p_gen, attn_dist, coverage = decoder(
                     dec_inp, hidden_state, cell_state, coverage)
 
@@ -111,7 +110,7 @@ def main():
             grads = tape.gradient(total_loss, trainable_var)
             print("applying gradients")
             optimizer.apply_gradients(zip(grads, trainable_var))
-            return batch_loss
+        return batch_loss
 
 
     for _ in range(3):
