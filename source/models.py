@@ -37,8 +37,8 @@ class BiEncoder(Model):
 class BahdanauAttention(Layer):
     def __init__(self, batch_sz, attn_sz):
         '''
-            batch_sz = enc_out_shape[0]
-            attn_sz = enc_out_shape[2], the encoder units
+        batch_sz = enc_out_shape[0]
+        attn_sz = enc_out_shape[2], the encoder units
         '''
         super(BahdanauAttention, self).__init__()
         self.batch_sz = batch_sz
@@ -92,10 +92,10 @@ class BahdanauAttention(Layer):
 
 class AttentionDecoder(Model):
     def __init__(self, batch_sz, inp_dim, out_dim, 
-                 embed_dim=1024, 
-                 dec_units=1024, 
-                 dropout=0.25, 
-                 recurrent_dropout=0.1):
+                 embed_dim=2048, 
+                 dec_units=2048, 
+                 dropout=0.35, 
+                 recurrent_dropout=0.2):
         '''
         attn_shape is same as enc_out_shape: h_i shape
         '''
@@ -112,7 +112,6 @@ class AttentionDecoder(Model):
         self.W2 = Dense(dec_units)
         self.V1 = Dense(dec_units)
         self.V2 = Dense(out_dim)
-
         self.prev_context_vector = None
 
     def call(self, x, h_i, state_c, prev_coverage=None):
