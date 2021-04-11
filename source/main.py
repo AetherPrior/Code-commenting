@@ -1,11 +1,12 @@
 import config
-import numpy as np
+from time import time
 import tensorflow as tf
 from loss import coverage_loss
 from vocab2dict import VocabData
-from tensorflow.keras.optimizers import Nadam, Adadelta, RMSprop
-from models import BiEncoder, BahdanauAttention, AttentionDecoder
+from tensorflow.keras.optimizers import Adam
+from models import BiEncoder, AttentionDecoder
 from tensorflow.keras.preprocessing.sequence import pad_sequences
+
 
 input_path_code = "./Dataset/data_RQ1/train/train.token.code"
 input_path_nl = "./Dataset/data_RQ1/train/train.token.nl"
@@ -57,7 +58,7 @@ def get_batch(batch_sz):
 
 
 def main():
-    learning_rate = 1e-3
+    learning_rate = 5e-3
     batch_sz = 8
 
     encoder_code = BiEncoder(inp_dim=vocab_size_code)
@@ -69,53 +70,48 @@ def main():
         out_dim=vocab_size_nl
     )
 
-    optimizer = Adadelta(learning_rate=learning_rate)
+    optimizer = Adam(learning_rate=learning_rate, amsgrad=True)
+    criterion = coverage_loss
 
     def train_step(inp_code, inp_ast, target):
         total_loss = 0
         with tf.GradientTape() as tape:
             hidden_state_code, cell_state_code = encoder_code(inp_code)
             hidden_state_ast, cell_state_ast = encoder_ast(inp_ast)
-            
-            hsct = hidden_state_code.shape[1]
-            hsat = hidden_state_ast.shape[1]
-            
-            if hsct > hsat:
-                hidden_state_ast = pad_sequences(hidden_state_ast, maxlen=hsct)
-            else:
-                hidden_state_code = pad_sequences(hidden_state_code, maxlen=hsat)
 
-            hidden_state = tf.concat([hidden_state_code, hidden_state_ast], axis=-1)
-            cell_state = tf.concat([cell_state_code, cell_state_ast], axis=-1)
-            
+            hidden_state = tf.concat([hidden_state_code, hidden_state_ast], axis=1)
+            cell_state = cell_state_code + cell_state_ast
             coverage = None
 
             for i in range(1, target.shape[1]):
                 dec_inp = tf.expand_dims((([config.BOS] * batch_sz) if (i == 1) else targ), axis=1)
-                cell_state, p_vocab, p_gen, attn_dist, coverage = decoder(
-                    dec_inp, hidden_state, cell_state, coverage)
+                cell_state, p_vocab, p_gen, attn_dist, coverage = decoder(dec_inp, 
+                                                                          hidden_state, 
+                                                                          cell_state, 
+                                                                          coverage)
 
                 targ = target[:, i]
-                p_vocab = p_gen*p_vocab
-                p_attn = (1-p_gen)*attn_dist
-                loss_value = coverage_loss(targ, p_vocab, attn_dist, coverage)
+                p_vocab = p_gen * p_vocab
+                p_attn = (1-p_gen) * attn_dist
+                loss_value = criterion(targ, p_vocab, attn_dist, coverage)
                 total_loss += loss_value
             
             batch_loss = total_loss / int(target.shape[1])
-            trainable_var = encoder_ast.trainable_variables + \
-                            encoder_code.trainable_variables + \
+            trainable_var = encoder_code.trainable_variables + \
+                            encoder_ast.trainable_variables + \
                             decoder.trainable_variables
-            
-            print("computing gradients")
+
             grads = tape.gradient(total_loss, trainable_var)
-            print("applying gradients")
             optimizer.apply_gradients(zip(grads, trainable_var))
-        return batch_loss
+        return tf.reduce_sum(batch_loss)
 
 
-    for _ in range(3):
+    for _ in range(10):
+        start = time()
         inp_code, inp_ast, target = get_batch(batch_sz)
-        print(train_step(inp_code, inp_ast, target).numpy())
+        batch_loss = train_step(inp_code, inp_ast, target)
+        runtime = round(time() - start, 2)
+        print(f"Loss: {batch_loss} Time: {runtime}s")
 
 
 if __name__ == '__main__':

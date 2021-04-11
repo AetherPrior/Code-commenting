@@ -1,7 +1,7 @@
 import tensorflow as tf
 
 
-def coverage_loss(targets, predictions, attention_weights, coverage_vector, coverage_lambda=0.5):
+def coverage_loss(targets, predictions, attention_weights, coverage_vector, coverage_lambda=1.0):
     loss_object = tf.keras.losses.SparseCategoricalCrossentropy(
         reduction=tf.keras.losses.Reduction.SUM)
     covloss = tf.reduce_sum(tf.minimum(

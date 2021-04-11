@@ -7,9 +7,7 @@ from tensorflow.keras.layers import Bidirectional, LSTM, Dense, Embedding, Conv2
 class BiEncoder(Model):
     def __init__(self, inp_dim, 
                  embed_dim=512, 
-                 enc_units=512, 
-                 dropout=0.25, 
-                 recurrent_dropout=0.1):
+                 enc_units=512):
         '''
         Perferable to have a BiLSTM
         h_i - hidden vectors
@@ -21,9 +19,8 @@ class BiEncoder(Model):
                                    output_dim=embed_dim)
         self.lstm = LSTM(enc_units, 
                          return_state=True, 
-                         return_sequences=True, 
-                         dropout=dropout, 
-                         recurrent_dropout=recurrent_dropout)
+                         return_sequences=True)
+
         self.lstm = Bidirectional(self.lstm, 
                                   merge_mode="concat")
 
@@ -92,10 +89,8 @@ class BahdanauAttention(Layer):
 
 class AttentionDecoder(Model):
     def __init__(self, batch_sz, inp_dim, out_dim, 
-                 embed_dim=2048, 
-                 dec_units=2048, 
-                 dropout=0.35, 
-                 recurrent_dropout=0.2):
+                 embed_dim=1024, 
+                 dec_units=1024):
         '''
         attn_shape is same as enc_out_shape: h_i shape
         '''
@@ -104,9 +99,7 @@ class AttentionDecoder(Model):
             batch_sz=batch_sz, attn_sz=dec_units)
         self.embedding = Embedding(inp_dim, embed_dim)
         self.lstm = LSTM(dec_units, 
-                         return_state=True, 
-                         dropout=dropout, 
-                         recurrent_dropout=recurrent_dropout)
+                         return_state=True) 
 
         self.W1 = Dense(1)
         self.W2 = Dense(dec_units)
@@ -115,19 +108,18 @@ class AttentionDecoder(Model):
         self.prev_context_vector = None
 
     def call(self, x, h_i, state_c, prev_coverage=None):
-
         if self.prev_context_vector is None:
             context_vector, _, _ = self.attention(h_i, state_c)
         else:
             context_vector = self.prev_context_vector
-
+        
         x = self.embedding(x)
 
         x = self.W2(
             tf.concat([x, tf.expand_dims(context_vector, axis=1)], axis=1))
 
         _, _, state_c = self.lstm(x)
-
+        
         # call Bahdanau's attention
         context_vector, attn_dist, coverage = self.attention(
             h_i, state_c, prev_coverage)
