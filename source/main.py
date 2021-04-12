@@ -6,25 +6,31 @@ from loss import coverage_loss
 from vocab2dict import VocabData
 from tensorflow.data import Dataset
 from tensorflow.keras.optimizers import *
-from models import BiEncoder, AttentionDecoder
+from models import Encoder, AttentionDecoder
 from tensorflow.keras.preprocessing.sequence import pad_sequences
+from tensorflow_addons.optimizers import NovoGrad, SGDW, AdamW, Lookahead
+
 
 # Some global declarations
 parser = argparse.ArgumentParser(description="Run the Model")
-parser.add_argument("-b", "--batch_size", type=int, default=8, help="Batch size for the model")
+parser.add_argument("-b", "--batch-size", dest="bs", type=int, default=8, help="Batch size for the model")
 parser.add_argument("-e", "--epochs", type=int, default=10, help="Number of epochs for the model")
-parser.add_argument("-lr", "--learning_rate", type=float, default=1e-3, help="learning rate for the model")
+parser.add_argument("-lr", "--learning-rate", dest="lr", type=float, default=1e-3, help="learning rate for the model")
 parser.add_argument("-o", "--optimizer", type=str, default="adadelta", help="type of optimizer")
 parser.add_argument("-log", "--logging", type=int, default=100, help="log the loss after")
+parser.add_argument("-la", "--look-ahead", dest="la", action="store_true")
 args = parser.parse_args()
 
 avail_optims = {
-    "sgd": SGD(learning_rate=args.learning_rate, momentum=0.9, nesterov=True),
-    "adagrad": Adagrad(learning_rate=args.learning_rate),
-    "adadelta": Adadelta(learning_rate=args.learning_rate),
-    "rmsprop": RMSprop(learning_rate=args.learning_rate, momentum=0.9, centered=True),
-    "adam": Adam(learning_rate=args.learning_rate, amsgrad=True),
-    "nadam": Nadam(learning_rate=args.learning_rate)
+    "sgd": SGD(learning_rate=args.lr, momentum=0.9, nesterov=True),
+    "adagrad": Adagrad(learning_rate=args.lr),
+    "adadelta": Adadelta(learning_rate=args.lr),
+    "rmsprop": RMSprop(learning_rate=args.lr, momentum=0.9, centered=True),
+    "adam": Adam(learning_rate=args.lr),
+    "nadam": Nadam(learning_rate=args.lr),
+    "novograd": NovoGrad(learning_rate=args.lr, weight_decay=1e-6),
+    "adamw": AdamW(learning_rate=args.lr, weight_decay=1e-6),
+    "sgdw": SGDW(learning_rate=args.lr, weight_decay=1e-6, momentum=0.9, nesterov=True)
 }
 
 input_path_code = "./Dataset/data_RQ1/train/train.token.code"
@@ -68,13 +74,13 @@ def create_batched_dataset(batch_size):
 
 
 def main():
-    batch_sz = args.batch_size
+    batch_sz = args.bs
     epochs = args.epochs
     logging = args.logging
     dataset, buffer_sz = create_batched_dataset(batch_sz)
 
-    encoder_code = BiEncoder(inp_dim=vocab_size_code)
-    encoder_ast = BiEncoder(inp_dim=vocab_size_ast)
+    encoder_code = Encoder(inp_dim=vocab_size_code)
+    encoder_ast = Encoder(inp_dim=vocab_size_ast)
 
     decoder = AttentionDecoder(
         batch_sz=batch_sz,
@@ -84,6 +90,9 @@ def main():
 
     print(f"[INFO] Using the optimizer {args.optimizer}")
     optim = avail_optims[args.optimizer]
+    if args.la:
+        print("[INFO] Using LookAhead wrapper on optimizer")
+        optim = Lookahead(optim)
     criterion = coverage_loss
 
     def train_step(inp_code, inp_ast, target):
@@ -106,7 +115,7 @@ def main():
                 targ = target[:, i]
                 p_vocab = p_gen * p_vocab
                 p_attn = (1-p_gen) * attn_dist
-                loss_value = criterion(targ, p_vocab, attn_dist, coverage)
+                loss_value = criterion(targ, p_vocab, attn_dist, coverage, coverage_lambda=0.0)
                 total_loss += loss_value
             
             batch_loss = total_loss / int(target.shape[1])
@@ -119,12 +128,15 @@ def main():
         return tf.reduce_sum(batch_loss)
 
     print(f"[INFO] Steps per epoch: {buffer_sz // batch_sz}")
-    for (batch, (code, ast, targ)) in enumerate(dataset):
-        start = time()
-        batch_loss = train_step(code, ast, targ)
-        runtime = round(time() - start, 2)
-        if not batch % logging:
-            print(f"[INFO] Batch: {batch}, Loss: {batch_loss}, Time: {runtime}s")
+    
+    for _ in range(1, epochs+1):
+        print(f"[INFO] Running epoch: {_}")
+        for (batch, (code, ast, targ)) in enumerate(dataset):
+            start = time()
+            batch_loss = train_step(code, ast, targ).numpy()
+            runtime = round(time() - start, 2)
+            if not batch % logging:
+                print("[INFO] Batch: {} | Loss: {:^.2f} | Time: {:^.2f}s".format(batch, batch_loss, runtime))
 
 
 if __name__ == '__main__':

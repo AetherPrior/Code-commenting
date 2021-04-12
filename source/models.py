@@ -1,32 +1,28 @@
 import tensorflow as tf
 from tensorflow.keras.models import Model
 from tensorflow.nn import sigmoid, tanh, softmax
-from tensorflow.keras.layers import Bidirectional, LSTM, Dense, Embedding, Conv2D, Layer
+from tensorflow.keras.layers import LSTM, Dense, Embedding, Conv2D, Layer
 
 
-class BiEncoder(Model):
+class Encoder(Model):
     def __init__(self, inp_dim, 
                  embed_dim=128, 
                  enc_units=128):
         '''
-        Perferable to have a BiLSTM
         h_i - hidden vectors
         state_c - cell state output
         '''
-        super(BiEncoder, self).__init__()
+        super(Encoder, self).__init__()
 
         self.embedding = Embedding(input_dim=inp_dim, 
                                    output_dim=embed_dim)
         self.lstm = LSTM(enc_units, 
                          return_state=True, 
                          return_sequences=True)
-        self.lstm = Bidirectional(self.lstm, 
-                                  merge_mode="concat")
 
     def call(self, x):
         x = self.embedding(x)
-        enc_output, _, forward_c, _, backward_c = self.lstm(x)
-        state_c = tf.concat([forward_c, backward_c], axis=-1)
+        enc_output, _, state_c = self.lstm(x)
         return (enc_output, state_c)
 
 
@@ -88,8 +84,8 @@ class BahdanauAttention(Layer):
 
 class AttentionDecoder(Model):
     def __init__(self, batch_sz, inp_dim, out_dim, 
-                 embed_dim=256, 
-                 dec_units=256):
+                 embed_dim=128, 
+                 dec_units=128):
         '''
         attn_shape is same as enc_out_shape: h_i shape
         '''
