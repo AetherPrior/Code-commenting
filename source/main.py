@@ -1,14 +1,31 @@
 import config
+import argparse
 from time import time
 import tensorflow as tf
-import tensorboard
-from datetime import datetime
 from loss import coverage_loss
 from vocab2dict import VocabData
-from tensorflow.keras.optimizers import Adam
+from tensorflow.data import Dataset
+from tensorflow.keras.optimizers import *
 from models import BiEncoder, AttentionDecoder
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 
+# Some global declarations
+parser = argparse.ArgumentParser(description="Run the Model")
+parser.add_argument("-b", "--batch_size", type=int, default=8, help="Batch size for the model")
+parser.add_argument("-e", "--epochs", type=int, default=10, help="Number of epochs for the model")
+parser.add_argument("-lr", "--learning_rate", type=float, default=1e-3, help="learning rate for the model")
+parser.add_argument("-o", "--optimizer", type=str, default="adadelta", help="type of optimizer")
+parser.add_argument("-log", "--logging", type=int, default=100, help="log the loss after")
+args = parser.parse_args()
+
+avail_optims = {
+    "sgd": SGD(learning_rate=args.learning_rate, momentum=0.9, nesterov=True),
+    "adagrad": Adagrad(learning_rate=args.learning_rate),
+    "adadelta": Adadelta(learning_rate=args.learning_rate),
+    "rmsprop": RMSprop(learning_rate=args.learning_rate, momentum=0.9, centered=True),
+    "adam": Adam(learning_rate=args.learning_rate, amsgrad=True),
+    "nadam": Nadam(learning_rate=args.learning_rate)
+}
 
 input_path_code = "./Dataset/data_RQ1/train/train.token.code"
 input_path_nl = "./Dataset/data_RQ1/train/train.token.nl"
@@ -27,6 +44,7 @@ def preprocess(input_path, ext):
         vocab = VocabData(config.AST_VOCAB)
 
     with open(input_path, 'r') as input_file:
+        complete_dataset = []
         for line in input_file.readlines():
             line = f"<S> {line} </S>"
             indices = []
@@ -35,32 +53,25 @@ def preprocess(input_path, ext):
                     indices.append(vocab.vocab_dict[word])
                 except KeyError:
                     indices.append(config.UNK)
-            yield indices
+            complete_dataset.append(indices)
+        return pad_sequences(complete_dataset)
 
 
-def get_batch(batch_sz):
-    batch_code, batch_nl, batch_ast = [], [], []
-
-    gen_code, gen_nl, gen_ast = (preprocess(input_path_code, ext="code"),
-                                 preprocess(input_path_nl, ext="nl"),
-                                 preprocess(input_path_ast, ext="ast"))
-
-    try:
-        for i in range(batch_sz):
-            batch_code.append(next(gen_code))
-            batch_nl.append(next(gen_nl))
-            batch_ast.append(next(gen_ast))
-    except StopIteration:
-        print("Max Size Reached")
-
-    return (tf.convert_to_tensor(pad_sequences(batch_code)),
-            tf.convert_to_tensor(pad_sequences(batch_ast)),
-            tf.convert_to_tensor(pad_sequences(batch_nl)))
+def create_batched_dataset(batch_size):
+    code_data = preprocess(input_path_code, ext="code")
+    ast_data = preprocess(input_path_ast, ext="ast")
+    nl_data = preprocess(input_path_nl, ext="nl")
+    buffer_size = code_data.shape[0]
+    dataset = Dataset.from_tensor_slices((code_data, ast_data, nl_data)).shuffle(buffer_size)
+    dataset = dataset.batch(batch_size, drop_remainder=True)
+    return (dataset, buffer_size)
 
 
 def main():
-    learning_rate = 5e-3
-    batch_sz = 8
+    batch_sz = args.batch_size
+    epochs = args.epochs
+    logging = args.logging
+    dataset, buffer_sz = create_batched_dataset(batch_sz)
 
     encoder_code = BiEncoder(inp_dim=vocab_size_code)
     encoder_ast = BiEncoder(inp_dim=vocab_size_ast)
@@ -71,7 +82,8 @@ def main():
         out_dim=vocab_size_nl
     )
 
-    optimizer = Adam(learning_rate=learning_rate, amsgrad=True)
+    print(f"[INFO] Using the optimizer {args.optimizer}")
+    optim = avail_optims[args.optimizer]
     criterion = coverage_loss
 
     def train_step(inp_code, inp_ast, target):
@@ -80,17 +92,15 @@ def main():
             hidden_state_code, cell_state_code = encoder_code(inp_code)
             hidden_state_ast, cell_state_ast = encoder_ast(inp_ast)
 
-            hidden_state = tf.concat(
-                [hidden_state_code, hidden_state_ast], axis=1)
+            hidden_state = tf.concat([hidden_state_code, hidden_state_ast], axis=1)
             cell_state = cell_state_code + cell_state_ast
             coverage = None
 
             for i in range(1, target.shape[1]):
-                dec_inp = tf.expand_dims(
-                    (([config.BOS] * batch_sz) if (i == 1) else targ), axis=1)
-                cell_state, p_vocab, p_gen, attn_dist, coverage = decoder(dec_inp,
-                                                                          hidden_state,
-                                                                          cell_state,
+                dec_inp = tf.expand_dims((([config.BOS] * batch_sz) if (i == 1) else targ), axis=1)
+                cell_state, p_vocab, p_gen, attn_dist, coverage = decoder(dec_inp, 
+                                                                          hidden_state, 
+                                                                          cell_state, 
                                                                           coverage)
 
                 targ = target[:, i]
@@ -98,26 +108,23 @@ def main():
                 p_attn = (1-p_gen) * attn_dist
                 loss_value = criterion(targ, p_vocab, attn_dist, coverage)
                 total_loss += loss_value
-
+            
             batch_loss = total_loss / int(target.shape[1])
             trainable_var = encoder_code.trainable_variables + \
-                encoder_ast.trainable_variables + \
-                decoder.trainable_variables
+                            encoder_ast.trainable_variables + \
+                            decoder.trainable_variables
 
             grads = tape.gradient(total_loss, trainable_var)
-            optimizer.apply_gradients(zip(grads, trainable_var))
+            optim.apply_gradients(zip(grads, trainable_var))
         return tf.reduce_sum(batch_loss)
 
-    # Define the Keras TensorBoard callback.
-    logdir = "logs/fit/" + datetime.now().strftime("%Y%m%d-%H%M%S")
-    tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=logdir)
-
-    for _ in range(10):
+    print(f"[INFO] Steps per epoch: {buffer_sz // batch_sz}")
+    for (batch, (code, ast, targ)) in enumerate(dataset):
         start = time()
-        inp_code, inp_ast, target = get_batch(batch_sz)
-        batch_loss = train_step(inp_code, inp_ast, target)
+        batch_loss = train_step(code, ast, targ)
         runtime = round(time() - start, 2)
-        print(f"Loss: {batch_loss} Time: {runtime}s")
+        if not batch % logging:
+            print(f"[INFO] Batch: {batch}, Loss: {batch_loss}, Time: {runtime}s")
 
 
 if __name__ == '__main__':
