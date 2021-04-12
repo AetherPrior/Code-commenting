@@ -6,8 +6,8 @@ from tensorflow.keras.layers import Bidirectional, LSTM, Dense, Embedding, Conv2
 
 class BiEncoder(Model):
     def __init__(self, inp_dim, 
-                 embed_dim=128, 
-                 enc_units=128):
+                 embed_dim=512, 
+                 enc_units=512):
         '''
         Perferable to have a BiLSTM
         h_i - hidden vectors
@@ -20,6 +20,7 @@ class BiEncoder(Model):
         self.lstm = LSTM(enc_units, 
                          return_state=True, 
                          return_sequences=True)
+
         self.lstm = Bidirectional(self.lstm, 
                                   merge_mode="concat")
 
@@ -88,8 +89,8 @@ class BahdanauAttention(Layer):
 
 class AttentionDecoder(Model):
     def __init__(self, batch_sz, inp_dim, out_dim, 
-                 embed_dim=256, 
-                 dec_units=256):
+                 embed_dim=1024, 
+                 dec_units=1024):
         '''
         attn_shape is same as enc_out_shape: h_i shape
         '''
