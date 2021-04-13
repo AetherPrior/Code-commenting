@@ -13,11 +13,16 @@ from tensorflow_addons.optimizers import NovoGrad, SGDW, AdamW, Lookahead
 
 # Some global declarations
 parser = argparse.ArgumentParser(description="Run the Model")
-parser.add_argument("-b", "--batch-size", dest="bs", type=int, default=8, help="Batch size for the model")
-parser.add_argument("-e", "--epochs", type=int, default=10, help="Number of epochs for the model")
-parser.add_argument("-lr", "--learning-rate", dest="lr", type=float, default=1e-3, help="learning rate for the model")
-parser.add_argument("-o", "--optimizer", type=str, default="adadelta", help="type of optimizer")
-parser.add_argument("-log", "--logging", type=int, default=100, help="log the loss after")
+parser.add_argument("-b", "--batch-size", dest="bs", type=int,
+                    default=8, help="Batch size for the model")
+parser.add_argument("-e", "--epochs", type=int, default=10,
+                    help="Number of epochs for the model")
+parser.add_argument("-lr", "--learning-rate", dest="lr",
+                    type=float, default=1e-3, help="learning rate for the model")
+parser.add_argument("-o", "--optimizer", type=str,
+                    default="adadelta", help="type of optimizer")
+parser.add_argument("-log", "--logging", type=int,
+                    default=100, help="log the loss after")
 parser.add_argument("-la", "--look-ahead", dest="la", action="store_true")
 args = parser.parse_args()
 
@@ -25,7 +30,7 @@ avail_optims = {
     "sgd": SGD(learning_rate=args.lr, momentum=0.9, nesterov=True),
     "adagrad": Adagrad(learning_rate=args.lr),
     "adadelta": Adadelta(learning_rate=args.lr),
-    "rmsprop": RMSprop(learning_rate=args.lr, momentum=0.9, centered=True),
+    "rmsprop": RMSprop(learning_rate=args.lr),
     "adam": Adam(learning_rate=args.lr),
     "nadam": Nadam(learning_rate=args.lr),
     "novograd": NovoGrad(learning_rate=args.lr, weight_decay=1e-6),
@@ -64,11 +69,14 @@ def preprocess(input_path, ext):
 
 
 def create_batched_dataset(batch_size):
-    code_data = preprocess(input_path_code, ext="code")
     ast_data = preprocess(input_path_ast, ext="ast")
+    code_data = preprocess(input_path_code, ext="code")
+    code_data = pad_sequences(code_data, maxlen=ast_data.shape[1])
     nl_data = preprocess(input_path_nl, ext="nl")
     buffer_size = code_data.shape[0]
-    dataset = Dataset.from_tensor_slices((code_data, ast_data, nl_data)).shuffle(buffer_size)
+    print(code_data.shape, ast_data.shape, nl_data.shape)
+    dataset = Dataset.from_tensor_slices(
+        (code_data, ast_data, nl_data)).shuffle(buffer_size)
     dataset = dataset.batch(batch_size, drop_remainder=True)
     return (dataset, buffer_size)
 
@@ -101,34 +109,37 @@ def main():
             hidden_state_code, cell_state_code = encoder_code(inp_code)
             hidden_state_ast, cell_state_ast = encoder_ast(inp_ast)
 
-            hidden_state = tf.concat([hidden_state_code, hidden_state_ast], axis=1)
-            cell_state = cell_state_code + cell_state_ast
+            hidden_state = tf.concat(
+                [hidden_state_code, hidden_state_ast], axis=-1)
+            cell_state = tf.concat([cell_state_code, cell_state_ast], axis=-1)
             coverage = None
 
             for i in range(1, target.shape[1]):
-                dec_inp = tf.expand_dims((([config.BOS] * batch_sz) if (i == 1) else targ), axis=1)
-                cell_state, p_vocab, p_gen, attn_dist, coverage = decoder(dec_inp, 
-                                                                          hidden_state, 
-                                                                          cell_state, 
+                dec_inp = tf.expand_dims(
+                    (([config.BOS] * batch_sz) if (i == 1) else targ), axis=1)
+                cell_state, p_vocab, p_gen, attn_dist, coverage = decoder(dec_inp,
+                                                                          hidden_state,
+                                                                          cell_state,
                                                                           coverage)
 
                 targ = target[:, i]
                 p_vocab = p_gen * p_vocab
                 p_attn = (1-p_gen) * attn_dist
-                loss_value = criterion(targ, p_vocab, attn_dist, coverage, coverage_lambda=0.0)
+                loss_value = criterion(
+                    targ, p_vocab, attn_dist, coverage, coverage_lambda=0.0)
                 total_loss += loss_value
-            
+
             batch_loss = total_loss / int(target.shape[1])
             trainable_var = encoder_code.trainable_variables + \
-                            encoder_ast.trainable_variables + \
-                            decoder.trainable_variables
+                encoder_ast.trainable_variables + \
+                decoder.trainable_variables
 
             grads = tape.gradient(total_loss, trainable_var)
             optim.apply_gradients(zip(grads, trainable_var))
         return tf.reduce_sum(batch_loss)
 
     print(f"[INFO] Steps per epoch: {buffer_sz // batch_sz}")
-    
+
     for _ in range(1, epochs+1):
         print(f"[INFO] Running epoch: {_}")
         for (batch, (code, ast, targ)) in enumerate(dataset):
@@ -136,7 +147,8 @@ def main():
             batch_loss = train_step(code, ast, targ).numpy()
             runtime = round(time() - start, 2)
             if not batch % logging:
-                print("[INFO] Batch: {} | Loss: {:^.2f} | Time: {:^.2f}s".format(batch, batch_loss, runtime))
+                print("[INFO] Batch: {} | Loss: {:^.2f} | Time: {:^.2f}s".format(
+                    batch, batch_loss, runtime))
 
 
 if __name__ == '__main__':

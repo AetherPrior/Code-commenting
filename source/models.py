@@ -5,8 +5,8 @@ from tensorflow.keras.layers import LSTM, Dense, Embedding, Conv2D, Layer
 
 
 class Encoder(Model):
-    def __init__(self, inp_dim, 
-                 embed_dim=128, 
+    def __init__(self, inp_dim,
+                 embed_dim=128,
                  enc_units=128):
         '''
         h_i - hidden vectors
@@ -14,11 +14,12 @@ class Encoder(Model):
         '''
         super(Encoder, self).__init__()
 
-        self.embedding = Embedding(input_dim=inp_dim, 
+        self.embedding = Embedding(input_dim=inp_dim,
                                    output_dim=embed_dim)
-        self.lstm = LSTM(enc_units, 
-                         return_state=True, 
-                         return_sequences=True)
+        self.lstm = LSTM(enc_units,
+                         return_state=True,
+                         return_sequences=True,
+                         stateful=True)
 
     def call(self, x):
         x = self.embedding(x)
@@ -35,12 +36,12 @@ class BahdanauAttention(Layer):
         super(BahdanauAttention, self).__init__()
         self.batch_sz = batch_sz
         self.attn_sz = attn_sz
-
-        self.W_h = Conv2D(filters=self.attn_sz, 
-                          kernel_size=1, 
+        print(f"decoder batch sz: {batch_sz}")
+        self.W_h = Conv2D(filters=self.attn_sz,
+                          kernel_size=1,
                           padding="same")
-        self.W_c = Conv2D(filters=self.attn_sz, 
-                          kernel_size=1, 
+        self.W_c = Conv2D(filters=self.attn_sz,
+                          kernel_size=1,
                           padding="same")
         self.W_s = Dense(self.attn_sz)
         self.V = Dense(self.attn_sz, use_bias=False)
@@ -83,8 +84,8 @@ class BahdanauAttention(Layer):
 
 
 class AttentionDecoder(Model):
-    def __init__(self, batch_sz, inp_dim, out_dim, 
-                 embed_dim=128, 
+    def __init__(self, batch_sz, inp_dim, out_dim,
+                 embed_dim=128,
                  dec_units=128):
         '''
         attn_shape is same as enc_out_shape: h_i shape
@@ -93,8 +94,9 @@ class AttentionDecoder(Model):
         self.attention = BahdanauAttention(
             batch_sz=batch_sz, attn_sz=dec_units)
         self.embedding = Embedding(inp_dim, embed_dim)
-        self.lstm = LSTM(dec_units, 
-                         return_state=True) 
+        self.lstm = LSTM(dec_units,
+                         return_state=True,
+                         stateful=True)
 
         self.W1 = Dense(1)
         self.W2 = Dense(dec_units)
@@ -107,14 +109,14 @@ class AttentionDecoder(Model):
             context_vector, _, _ = self.attention(h_i, state_c)
         else:
             context_vector = self.prev_context_vector
-        
+
         x = self.embedding(x)
 
         x = self.W2(
             tf.concat([x, tf.expand_dims(context_vector, axis=1)], axis=1))
 
         _, _, state_c = self.lstm(x)
-        
+
         # call Bahdanau's attention
         context_vector, attn_dist, coverage = self.attention(
             h_i, state_c, prev_coverage)
