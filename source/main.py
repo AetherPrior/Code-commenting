@@ -23,7 +23,11 @@ parser.add_argument("-o", "--optimizer", type=str,
                     default="adadelta", help="type of optimizer")
 parser.add_argument("-log", "--logging", type=int,
                     default=100, help="log the loss after")
+parser.add_argument("-cov", "--coverage", dest="cov", type=float,
+                    default=0.5, help="coverage loss hyperparameter")
 parser.add_argument("-la", "--look-ahead", dest="la", action="store_true")
+parser.add_argument("-wd", "--weight-decay", dest="wd", type=float,
+                    default=1e-2, help="weight decay for SGDW, AdamW and NovoGrad")
 args = parser.parse_args()
 
 avail_optims = {
@@ -31,11 +35,15 @@ avail_optims = {
     "adagrad": Adagrad(learning_rate=args.lr),
     "adadelta": Adadelta(learning_rate=args.lr),
     "rmsprop": RMSprop(learning_rate=args.lr),
+    << << << < Updated upstream
     "adam": Adam(learning_rate=args.lr),
+    == == == =
+    "adam": Adam(learning_rate=args.lr, amsgrad=True),
+    >>>>>> > Stashed changes
     "nadam": Nadam(learning_rate=args.lr),
-    "novograd": NovoGrad(learning_rate=args.lr, weight_decay=1e-6),
-    "adamw": AdamW(learning_rate=args.lr, weight_decay=1e-6),
-    "sgdw": SGDW(learning_rate=args.lr, weight_decay=1e-6, momentum=0.9, nesterov=True)
+    "novograd": NovoGrad(learning_rate=args.lr, weight_decay=args.wd),
+    "adamw": AdamW(learning_rate=args.lr, weight_decay=args.wd, amsgrad=True),
+    "sgdw": SGDW(learning_rate=args.lr, weight_decay=args.wd, momentum=0.9, nesterov=True)
 }
 
 input_path_code = "./Dataset/data_RQ1/train/train.token.code"
@@ -85,6 +93,7 @@ def main():
     batch_sz = args.bs
     epochs = args.epochs
     logging = args.logging
+    cov_lambda = args.cov
     dataset, buffer_sz = create_batched_dataset(batch_sz)
 
     encoder_code = Encoder(inp_dim=vocab_size_code)
@@ -109,6 +118,7 @@ def main():
             hidden_state_code, cell_state_code = encoder_code(inp_code)
             hidden_state_ast, cell_state_ast = encoder_ast(inp_ast)
 
+            # hidden_state_code = pad_sequences(hidden_state_code, maxlen=hidden_state_ast.shape[1])
             hidden_state = tf.concat(
                 [hidden_state_code, hidden_state_ast], axis=-1)
             cell_state = tf.concat([cell_state_code, cell_state_ast], axis=-1)
@@ -126,10 +136,10 @@ def main():
                 p_vocab = p_gen * p_vocab
                 p_attn = (1-p_gen) * attn_dist
                 loss_value = criterion(
-                    targ, p_vocab, attn_dist, coverage, coverage_lambda=0.0)
+                    targ, p_vocab, attn_dist, coverage, coverage_lambda=cov_lambda)
                 total_loss += loss_value
 
-            batch_loss = total_loss / int(target.shape[1])
+            batch_loss = total_loss / target.shape[1]
             trainable_var = encoder_code.trainable_variables + \
                 encoder_ast.trainable_variables + \
                 decoder.trainable_variables
@@ -139,16 +149,18 @@ def main():
         return tf.reduce_sum(batch_loss)
 
     print(f"[INFO] Steps per epoch: {buffer_sz // batch_sz}")
+    avg_time_per_batch = 0
 
     for _ in range(1, epochs+1):
         print(f"[INFO] Running epoch: {_}")
         for (batch, (code, ast, targ)) in enumerate(dataset):
             start = time()
             batch_loss = train_step(code, ast, targ).numpy()
-            runtime = round(time() - start, 2)
+            avg_time_per_batch += (time() - start)
             if not batch % logging:
-                print("[INFO] Batch: {} | Loss: {:^.2f} | Time: {:^.2f}s".format(
-                    batch, batch_loss, runtime))
+                print("[INFO] Batch: {} | Loss: {:.2f} | {:.2f} sec/batch".format(batch,
+                                                                                  batch_loss, avg_time_per_batch/logging))
+                avg_time_per_batch = 0
 
 
 if __name__ == '__main__':
