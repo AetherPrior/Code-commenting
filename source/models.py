@@ -106,7 +106,7 @@ class AttentionDecoder(Model):
                          return_state=True,
                          return_sequences=True) 
 
-        self.W1 = Dense(1)
+        # self.W1 = Dense(1)
         self.W2 = Dense(dec_units)
         self.V1 = Dense(dec_units)
         self.V2 = Dense(inp_dim)
@@ -119,20 +119,17 @@ class AttentionDecoder(Model):
             context_vector = self.prev_context_vector
         
         x = self.embedding(x)
-
         x = self.W2(tf.concat([tf.expand_dims(context_vector, axis=1), x], axis=1))
-
         _, state_h, state_c = self.lstm(x, initial_state=[prev_h, prev_c])
         
         context_vector, attn_dist, coverage = self.attention(h_i, state_h)
+        p_vocab = softmax(self.V2(self.V1(tf.concat([context_vector, state_h], axis=1))))
 
-        z = tf.concat([context_vector, state_h], axis=1)
-        p_vocab = softmax(self.V2(self.V1(z)))
-
-        x = tf.reshape(x, (-1, x.shape[1] * x.shape[-1]))
-        temp = tf.concat([context_vector, state_h, x], axis=-1)
-        p_gen = sigmoid(self.W1(temp))
+        # x = tf.reshape(x, (-1, x.shape[1] * x.shape[-1]))
+        # temp = tf.concat([context_vector, state_h, x], axis=-1)
+        # p_gen = sigmoid(self.W1(temp))
 
         self.prev_context_vector = context_vector
         
-        return (p_vocab, p_gen, attn_dist, state_h, state_c, coverage)
+        # return (p_vocab, p_gen, attn_dist, state_h, state_c, coverage)
+        return (p_vocab, attn_dist, state_h, state_c, coverage)
