@@ -1,7 +1,7 @@
 import tensorflow as tf
 from tensorflow.keras.models import Model
 from tensorflow.nn import sigmoid, tanh, softmax, relu
-from tensorflow.keras.layers import LSTM, Dense, Embedding, Layer, Bidirectional
+from tensorflow.keras.layers import LSTM, Dense, Embedding, Layer, Bidirectional, Dropout
 
 
 class BiEncoder(Model):
@@ -62,9 +62,8 @@ class BahdanauAttention(Layer):
         self.W_h = Dense(self.attn_sz, use_bias=False)
         self.W_c = Dense(self.attn_sz, use_bias=False)
         self.W_s = Dense(self.attn_sz)
-        self.coverage = None
 
-    def call(self, h_i, s_t):
+    def call(self, h_i, s_t, coverage=None):
         '''
         h_i - encoder states: (batch_sz, t_k, attn_sz)
         s_t - decoder cell state: (batch_sz, state_sz)
@@ -73,22 +72,22 @@ class BahdanauAttention(Layer):
         dec_features = tf.expand_dims(self.W_s(s_t), axis=1)
         features = enc_features + dec_features
     
-        if self.coverage is not None:
-            coverage_input = tf.expand_dims(self.coverage, axis=-1)
+        if coverage is not None:
+            coverage_input = tf.expand_dims(coverage, axis=-1)
             features += self.W_c(coverage_input)
             
         e_t = self.V(tanh(features))
         e_t = tf.reshape(e_t, [-1, e_t.shape[1]])
         a_t = softmax(e_t, axis=1)
         
-        if self.coverage is None:
-            self.coverage = a_t
+        if coverage is None:
+            coverage = a_t
         else:
-            self.coverage += a_t
+            coverage += a_t
 
         context_vector = tf.matmul(tf.expand_dims(a_t, axis=1), h_i)
         context_vector = tf.squeeze(context_vector, axis=1)
-        return (context_vector, a_t, self.coverage)
+        return (context_vector, a_t, coverage)
 
 
 class AttentionDecoder(Model):
@@ -106,13 +105,16 @@ class AttentionDecoder(Model):
                          return_state=True,
                          return_sequences=True) 
 
-        # self.W1 = Dense(1)
+        self.W1 = Dense(1)
         self.W2 = Dense(dec_units)
         self.V1 = Dense(dec_units)
         self.V2 = Dense(inp_dim)
         self.prev_context_vector = None
+        self.dropout_v1 = Dropout(0.2)
+        self.dropout_v2 = Dropout(0.2)
+        self.dropout_w1 = Dropout(0.17)
 
-    def call(self, x, h_i, prev_h, prev_c):
+    def call(self, x, h_i, prev_h, prev_c, coverage, max_oovs, inp_code_ext):
         if self.prev_context_vector is None:
             context_vector, _, _ = self.attention(h_i, prev_h)
         else:
@@ -122,14 +124,27 @@ class AttentionDecoder(Model):
         x = self.W2(tf.concat([tf.expand_dims(context_vector, axis=1), x], axis=1))
         _, state_h, state_c = self.lstm(x, initial_state=[prev_h, prev_c])
         
-        context_vector, attn_dist, coverage = self.attention(h_i, state_h)
-        p_vocab = softmax(self.V2(self.V1(tf.concat([context_vector, state_h], axis=1))))
-
-        # x = tf.reshape(x, (-1, x.shape[1] * x.shape[-1]))
-        # temp = tf.concat([context_vector, state_h, x], axis=-1)
-        # p_gen = sigmoid(self.W1(temp))
-
+        context_vector, attn_dist, coverage = self.attention(h_i, state_h, coverage)
+        merged = tf.concat([context_vector, state_h], axis=1)
+        merged = self.dropout_v1(self.V1(merged))
+        p_vocab = softmax(self.dropout_v2(self.V2(merged)))
         self.prev_context_vector = context_vector
         
-        # return (p_vocab, p_gen, attn_dist, state_h, state_c, coverage)
-        return (p_vocab, attn_dist, state_h, state_c, coverage)
+        #----------------------------------**major-changes**-------------------------------#
+        #-----------------------------------**pointer-gen**--------------------------------#
+        
+        batch_sz = x.shape[0]
+        x = tf.reshape(x, (-1, x.shape[1] * x.shape[-1]))
+        merged = tf.concat([context_vector, state_h, x], axis=-1)
+        p_gen = sigmoid(self.dropout_w1(self.W1(merged)))
+        
+        P1 = p_gen * p_vocab
+        P2 = (1.0 - p_gen) * attn_dist
+        
+        P1 = tf.concat([P1, tf.zeros((batch_sz, max_oovs))], axis=-1)
+        batch_nums = tf.expand_dims(tf.range(0, batch_sz), 1)
+        batch_nums = tf.tile(batch_nums, [1, inp_code_ext.shape[1]])
+        indices = tf.stack((batch_nums, inp_code_ext), axis=2)
+        final_dist = P1 + tf.scatter_nd(indices, P2, [batch_sz, P1.shape[1]])
+
+        return (final_dist, attn_dist, state_h, state_c, coverage)
