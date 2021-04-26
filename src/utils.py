@@ -37,7 +37,7 @@ class BatchQueue:
             
             for line in self.__code_data[i:j]:
                 idxs, idxs_ex = [], []
-                vocab_sz = len(self.__code_vocab)
+                line = f"<S> {line} </S>"
                 for word in line.split():
                     try:
                         idxs.append(self.__code_vocab[word])
@@ -46,35 +46,37 @@ class BatchQueue:
                         if word not in oovs:
                             oovs.append(word)
                         idxs.append(self.__code_vocab["<UNK>"])
-                        idxs_ex.append(vocab_sz + oovs.index(word))
+                        idxs_ex.append(len(self.__code_vocab) + oovs.index(word))
                 code_batch.append(idxs)
                 ex_code_batch.append(idxs_ex)
-            code_batch = pad_sequences(code_batch)
-            ex_code_batch = pad_sequences(ex_code_batch)
+            code_batch = pad_sequences(code_batch, padding="post")
+            ex_code_batch = pad_sequences(ex_code_batch, padding="post")
 
             for line in self.__ast_data[i:j]:
                 idxs = []
+                line = f"<S> {line} </S>"
                 for word in line.split():
                     try:
                         idxs.append(self.__ast_vocab[word])
                     except KeyError:
                         idxs.append(self.__ast_vocab["<UNK>"])
                 ast_batch.append(idxs)
-            ast_batch = pad_sequences(ast_batch)
+            ast_batch = pad_sequences(ast_batch, padding="post")
 
             for line in self.__nl_data[i:j]:
                 idxs = []
+                line = f"<S> {line} </S>"
                 for word in line.split():
                     try:
                         idxs.append(self.__nl_vocab[word])
                     except KeyError:
                         idxs.append(self.__nl_vocab["<UNK>"])
                 nl_batch.append(idxs)
-            nl_batch = pad_sequences(nl_batch)
+            nl_batch = pad_sequences(nl_batch, padding="post")
                     
-            ast_batch = pad_sequences(ast_batch, maxlen=maxlen)
-            code_batch = pad_sequences(code_batch, maxlen=maxlen)
-            ex_code_batch = pad_sequences(code_batch, maxlen=maxlen)
+            ast_batch = pad_sequences(ast_batch, maxlen=maxlen, padding="post")
+            code_batch = pad_sequences(code_batch, maxlen=maxlen, padding="post")
+            ex_code_batch = pad_sequences(code_batch, maxlen=maxlen, padding="post")
 
             batch = Batch()
             batch.oovs = oovs
