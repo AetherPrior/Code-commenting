@@ -1,4 +1,3 @@
-from time import time
 import tensorflow as tf
 
 class Trainer:
@@ -10,7 +9,7 @@ class Trainer:
         self.logging = logging
         self.batch_sz = batch_sz
         self.optimizer = optimizer
-        self.batchqueue = batchqueue.batcher(self.batch_sz)
+        self.batchqueue = batchqueue
 
     def __train_step(self, code, code_ext, ast, target, max_oovs):
         with tf.GradientTape() as tape:
@@ -49,25 +48,24 @@ class Trainer:
         return final_loss.numpy()
 
     def train(self):
-        avg_time_per_batch = 0
         for epoch in range(self.epochs):
             print(f"[INFO] Running epoch: {epoch}")
-            for (nbatch, batch) in enumerate(self.batchqueue):
-                start = time()
+            temp_batchqueue = self.batchqueue.batcher(self.batch_sz)
+            for (nbatch, batch) in enumerate(temp_batchqueue):
                 loss = self.__train_step(batch.code, 
                                          batch.code_ex, 
                                          batch.ast, 
                                          batch.nl, 
                                          batch.max_oovs)
                 
-                avg_time_per_batch += (time() - start)
                 if not epoch and not nbatch:
                     self.encoder.summary()
                     self.decoder.summary()
                 if not nbatch % self.logging:
-                    avg_time_per_batch /= self.logging
-                    print("[INFO] Batch: {} | Loss: {:.2f} | {:.2f} sec/batch".format(nbatch, loss, avg_time_per_batch))
-                    avg_time_per_batch = 0
+                    out = "[INFO] Batch: {} | Loss: {:.2f}".format(nbatch, loss)
+                    with open("log.txt", 'a') as the_file:
+                        the_file.write(out + '\n')
+                    print(out)
 
     def store_checkpoint():
         pass

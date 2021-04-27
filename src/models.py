@@ -35,7 +35,7 @@ class BiEncoder(Model):
 
 
 class DeepCom(Model):
-    def __init__(self, inp_dim_code, inp_dim_ast, embed_dim=1024, enc_units=256):
+    def __init__(self, inp_dim_code, inp_dim_ast, embed_dim=128, enc_units=32):
         super(DeepCom, self).__init__()
         self.encoder_code = BiEncoder(inp_dim_code, embed_dim, enc_units)
         self.encoder_ast = BiEncoder(inp_dim_ast, embed_dim, enc_units)
@@ -92,8 +92,8 @@ class BahdanauAttention(Layer):
 
 class AttentionDecoder(Model):
     def __init__(self, inp_dim,
-                 embed_dim=1024, 
-                 dec_units=1024):
+                 embed_dim=128, 
+                 dec_units=128):
         '''
         attn_shape is same as enc_out_shape: h_i shape
         inp_dim == out_dim

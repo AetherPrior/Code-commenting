@@ -95,6 +95,8 @@ class BatchQueue:
         self.__nl_data = self.__read_data(config.paths[self.key]["NL_INPUT"])
         self.__ast_data = self.__read_data(config.paths[self.key]["AST_INPUT"])
         self.__code_data = self.__read_data(config.paths[self.key]["CODE_INPUT"])
+        
+        print(f"[INFO] Steps per epoch: {len(self.__code_data)//self.batch_sz}")
 
         if shuffle:
             combined = list(zip(self.__code_data, self.__ast_data, self.__nl_data))
@@ -104,7 +106,7 @@ class BatchQueue:
         # here batcher can be extended to return
         # the shuffle dataset as it is
         i, l = 0, len(self.__code_data)
-        while i < l:
-            j = min(i + self.batch_sz, l)
+        while i + self.batch_sz < l:
+            j = i + self.batch_sz
             yield self.__helper(i, j)
-            i += self.batch_sz
+            i = j
