@@ -39,11 +39,13 @@ class Trainer:
             sum_losses = tf.reduce_sum(tf.stack(step_losses, axis=1), axis=1)
             batch_avg_loss = sum_losses/target.shape[1]
             final_loss = tf.reduce_mean(batch_avg_loss)
+            scaled_final_loss = self.optimizer.get_scaled_loss(final_loss)
                             
             variables = self.encoder.trainable_variables + \
                         self.decoder.trainable_variables
 
-            grads = tape.gradient(final_loss, variables)
+            scaled_grads = tape.gradient(scaled_final_loss, variables)
+            grads = self.optimizer.get_unscaled_gradients(scaled_grads)
             self.optimizer.apply_gradients(zip(grads, variables))
         return final_loss.numpy()
 

@@ -141,7 +141,8 @@ class AttentionDecoder(Model):
         P1 = p_gen * p_vocab
         P2 = (1.0 - p_gen) * attn_dist
         
-        P1 = tf.concat([P1, tf.zeros((batch_sz, max_oovs))], axis=-1)
+        concat_extra_zeros = tf.zeros((batch_sz, max_oovs), dtype=tf.float16)
+        P1 = tf.concat([P1, concat_extra_zeros], axis=-1)
         batch_nums = tf.expand_dims(tf.range(0, batch_sz), 1)
         batch_nums = tf.tile(batch_nums, [1, inp_code_ext.shape[1]])
         indices = tf.stack((batch_nums, inp_code_ext), axis=2)

@@ -2,9 +2,11 @@ import config
 import argparse
 from Trainer import Trainer
 from utils import BatchQueue
+from tensorflow.keras import mixed_precision
 from models import DeepCom, AttentionDecoder
 from tensorflow_addons.optimizers import Lookahead, SGDW
 from tensorflow.keras.optimizers import Adam, Adagrad, RMSprop, SGD
+mixed_precision.set_global_policy('mixed_float16')
 
 
 parser = argparse.ArgumentParser(description="Run the Model")
@@ -46,6 +48,8 @@ optim = avail_optims[args.optimizer]
 if args.la:
     print("[INFO] Using LookAhead wrapper on optimizer")
     optim = Lookahead(optim)
+    
+optim = mixed_precision.LossScaleOptimizer(optim)
 
 model_trainer = Trainer(encoder=encoder,
                         decoder=decoder,
