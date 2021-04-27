@@ -2,16 +2,14 @@ import config
 import argparse
 from Trainer import Trainer
 from utils import BatchQueue
-from tensorflow.keras import mixed_precision
 from models import DeepCom, AttentionDecoder
-from tensorflow_addons.optimizers import Lookahead, SGDW
-from tensorflow.keras.optimizers import Adam, Adagrad, RMSprop, SGD
-mixed_precision.set_global_policy('mixed_float16')
+from tensorflow_addons.optimizers import Lookahead, SGDW, AdamW, RectifiedAdam
+from tensorflow.keras.optimizers import Adam, Adagrad, RMSprop, SGD, Nadam
 
 
 parser = argparse.ArgumentParser(description="Run the Model")
 parser.add_argument("-b", "--batch-size", dest="bs", type=int,
-                    default=8, help="Batch size for the model")
+                    default=128, help="Batch size for the model")
 parser.add_argument("-e", "--epochs", type=int, default=10,
                     help="Number of epochs for the model")
 parser.add_argument("-lr", "--learning-rate", dest="lr",
@@ -21,17 +19,20 @@ parser.add_argument("-o", "--optimizer", type=str,
 parser.add_argument("-log", "--logging", type=int, dest="logging",
                     default=100, help="log the loss after x batches")
 parser.add_argument("-la", "--look-ahead", dest="la", action="store_true")
-parser.add_argument("-ckpt", "--check-point-after", dest="ckpt",
+parser.add_argument("-ckpt", "--check-point-after", dest="ckpt", type=int,
                     default=250, help="check point the model after these many batches")
 args = parser.parse_args()
 
 
 avail_optims = {
+    "nadam": Nadam(learning_rate=args.lr),
     "rmsprop": RMSprop(learning_rate=args.lr),
     "adagrad": Adagrad(learning_rate=args.lr),
     "adam": Adam(learning_rate=args.lr, amsgrad=True),
+    "adamw": AdamW(weight_decay=1e-5, learning_rate=args.lr),
     "sgd": SGD(learning_rate=args.lr, momentum=0.9, nesterov=True),
-    "sgdw": SGDW(weight_decay=1e-5, learning_rate=args.lr, momentum=0.9, nesterov=True)
+    "sgdw": SGDW(weight_decay=1e-5, learning_rate=args.lr, momentum=0.9, nesterov=True),
+    "radam": RectifiedAdam(learning_rate=args.lr, weight_decay=1e-5, amsgrad=True, min_lr=1e-5)
 }
 
 
@@ -48,8 +49,6 @@ optim = avail_optims[args.optimizer]
 if args.la:
     print("[INFO] Using LookAhead wrapper on optimizer")
     optim = Lookahead(optim)
-    
-optim = mixed_precision.LossScaleOptimizer(optim)
 
 model_trainer = Trainer(encoder=encoder,
                         decoder=decoder,

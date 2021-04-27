@@ -1,7 +1,8 @@
 import tensorflow as tf
 from tensorflow.keras.models import Model
+from tensorflow_addons.activations import mish
 from tensorflow.nn import sigmoid, tanh, softmax, relu
-from tensorflow.keras.layers import LSTM, Dense, Embedding, Layer, Bidirectional, Dropout
+from tensorflow.keras.layers import LSTM, Dense, Embedding, Layer, Bidirectional
 
 
 class BiEncoder(Model):
@@ -29,8 +30,8 @@ class BiEncoder(Model):
     def call(self, x):
         x = self.embedding(x)
         enc_output, forward_h, forward_c, backward_h, backward_c = self.lstm(x)
-        state_c = relu(self.reduce_c(tf.concat([forward_c, backward_c], axis=-1)))
-        state_h = relu(self.reduce_h(tf.concat([forward_h, backward_h], axis=-1)))
+        state_c = mish(self.reduce_c(tf.concat([forward_c, backward_c], axis=-1)))
+        state_h = mish(self.reduce_h(tf.concat([forward_h, backward_h], axis=-1)))
         return (enc_output, state_h, state_c)
 
 
@@ -110,9 +111,6 @@ class AttentionDecoder(Model):
         self.V1 = Dense(dec_units)
         self.V2 = Dense(inp_dim)
         self.prev_context_vector = None
-        self.dropout_v1 = Dropout(0.2)
-        self.dropout_v2 = Dropout(0.2)
-        self.dropout_w1 = Dropout(0.17)
 
     def call(self, x, h_i, prev_h, prev_c, coverage, max_oovs, inp_code_ext):
         if self.prev_context_vector is None:
@@ -125,9 +123,7 @@ class AttentionDecoder(Model):
         _, state_h, state_c = self.lstm(x, initial_state=[prev_h, prev_c])
         
         context_vector, attn_dist, coverage = self.attention(h_i, state_h, coverage)
-        merged = tf.concat([context_vector, state_h], axis=1)
-        merged = self.dropout_v1(self.V1(merged))
-        p_vocab = softmax(self.dropout_v2(self.V2(merged)))
+        p_vocab = softmax(self.V2(self.V1(tf.concat([context_vector, state_h], axis=1))))
         self.prev_context_vector = context_vector
         
         #----------------------------------**major-changes**-------------------------------#
@@ -135,13 +131,12 @@ class AttentionDecoder(Model):
         
         batch_sz = x.shape[0]
         x = tf.reshape(x, (-1, x.shape[1] * x.shape[-1]))
-        merged = tf.concat([context_vector, state_h, x], axis=-1)
-        p_gen = sigmoid(self.dropout_w1(self.W1(merged)))
+        p_gen = sigmoid(self.W1(tf.concat([context_vector, state_h, x], axis=-1)))
         
         P1 = p_gen * p_vocab
         P2 = (1.0 - p_gen) * attn_dist
         
-        concat_extra_zeros = tf.zeros((batch_sz, max_oovs), dtype=tf.float16)
+        concat_extra_zeros = tf.zeros((batch_sz, max_oovs))
         P1 = tf.concat([P1, concat_extra_zeros], axis=-1)
         batch_nums = tf.expand_dims(tf.range(0, batch_sz), 1)
         batch_nums = tf.tile(batch_nums, [1, inp_code_ext.shape[1]])

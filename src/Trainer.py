@@ -1,8 +1,10 @@
+import sys
 import tensorflow as tf
+from os.path import exists
 
 class Trainer:
     def __init__(self, encoder, decoder, optimizer, batchqueue, batch_sz, epochs, logging, ckpt):
-        self.ckpt = ckpt
+        self.ckpt_num = ckpt
         self.epochs = epochs
         self.encoder = encoder
         self.decoder = decoder
@@ -10,6 +12,10 @@ class Trainer:
         self.batch_sz = batch_sz
         self.optimizer = optimizer
         self.batchqueue = batchqueue
+        self.checkpoint = tf.train.Checkpoint(encoder=self.encoder, 
+                                              decoder=self.decoder, 
+                                              step=tf.Variable(0), 
+                                              optimizer=self.optimizer)
 
     def __train_step(self, code, code_ext, ast, target, max_oovs):
         with tf.GradientTape() as tape:
@@ -39,17 +45,17 @@ class Trainer:
             sum_losses = tf.reduce_sum(tf.stack(step_losses, axis=1), axis=1)
             batch_avg_loss = sum_losses/target.shape[1]
             final_loss = tf.reduce_mean(batch_avg_loss)
-            scaled_final_loss = self.optimizer.get_scaled_loss(final_loss)
                             
             variables = self.encoder.trainable_variables + \
                         self.decoder.trainable_variables
 
-            scaled_grads = tape.gradient(scaled_final_loss, variables)
-            grads = self.optimizer.get_unscaled_gradients(scaled_grads)
+            grads = tape.gradient(final_loss, variables)
             self.optimizer.apply_gradients(zip(grads, variables))
         return final_loss.numpy()
 
     def train(self):
+        self.retrieve_checkpoint()
+                
         for epoch in range(self.epochs):
             print(f"[INFO] Running epoch: {epoch}")
             temp_batchqueue = self.batchqueue.batcher(self.batch_sz)
@@ -68,9 +74,21 @@ class Trainer:
                     with open("log.txt", 'a') as the_file:
                         the_file.write(out + '\n')
                     print(out)
+                if not nbatch and not nbatch % self.ckpt_num:
+                    self.checkpoint.step.assign_add(self.ckpt_num)
+                    self.store_checkpoint()
+                    print(f"[INFO] Stored checkpoint for step {int(self.checkpoint.step)}")
 
-    def store_checkpoint():
-        pass
+    def store_checkpoint(self):
+        self.checkpoint.write("./ckpts/ckpt")
 
-    def retrieve_checkpoint():
-        pass
+    def retrieve_checkpoint(self):
+        if exists("./ckpts/ckpt.index"):
+            try:
+                self.checkpoint.read("./ckpts/ckpt")
+                print("[INFO] Read Checkpoint")
+            except:
+                print("[INFO] Failed reading Checkpoint, going with no checkpoint")
+                print(sys.exc_info()[0])
+        else:
+            print("[INFO] Starting from scratch")
