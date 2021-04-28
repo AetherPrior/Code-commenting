@@ -7,20 +7,32 @@ class Batch:
         self.nl = None
         self.ast = None
         self.code = None
-        self.oovs = None
+        self.code_oovs = None
+        self.nl_oovs = None
         self.code_ex = None
-        self.max_oovs = None
+        self.max_code_oovs = None
+        self.max_nl_oovs = None
 
 
 class BatchQueue:
     def __init__(self, batch_sz, key="train"):
         self.key = key
         self.batch_sz = batch_sz
+        self.__nl_vocab, self.nl_list = self.__read_vocab(config.NL_VOCAB, return_data=True)
+        self.__ast_vocab = self.__read_vocab(config.AST_VOCAB)
+        self.__code_vocab = self.__read_vocab(config.CODE_VOCAB)
 
-    def __read_vocab(self, input_path):
+        self.__nl_data = self.__read_data(config.paths[self.key]["NL_INPUT"])
+        self.__ast_data = self.__read_data(config.paths[self.key]["AST_INPUT"])
+        self.__code_data = self.__read_data(config.paths[self.key]["CODE_INPUT"])
+
+    def __read_vocab(self, input_path, return_data=False):
         with open(input_path, 'r') as content_file:
             data = content_file.read().split('\n')
-        return {k: v for (v, k) in enumerate(data, start=1)}
+        vocab_dict = {k: v for (v, k) in enumerate(data, start=1)}
+        if return_data:
+            return vocab_dict, data
+        return vocab_dict
 
     def __read_data(self, input_path):
         with open(input_path, 'r') as input_file:
@@ -28,7 +40,7 @@ class BatchQueue:
         return data
 
     def __helper(self, i, j):
-            oovs = []
+            code_oovs = []
             nl_batch = []
             ast_batch = []
             code_batch = [] 
@@ -43,10 +55,10 @@ class BatchQueue:
                         idxs.append(self.__code_vocab[word])
                         idxs_ex.append(self.__code_vocab[word])
                     except KeyError:
-                        if word not in oovs:
-                            oovs.append(word)
+                        if word not in code_oovs:
+                            code_oovs.append(word)
                         idxs.append(self.__code_vocab["<UNK>"])
-                        idxs_ex.append(len(self.__code_vocab) + oovs.index(word))
+                        idxs_ex.append(len(self.__code_vocab) + code_oovs.index(word))
                 code_batch.append(idxs)
                 ex_code_batch.append(idxs_ex)
             code_batch = pad_sequences(code_batch, padding="post")
@@ -79,22 +91,15 @@ class BatchQueue:
             ex_code_batch = pad_sequences(ex_code_batch, maxlen=maxlen, padding="post")
 
             batch = Batch()
-            batch.oovs = oovs
+            batch.code_oovs = code_oovs
             batch.nl = nl_batch
             batch.ast = ast_batch
             batch.code = code_batch
-            batch.max_oovs = len(oovs)
+            batch.max_code_oovs = len(code_oovs)
             batch.code_ex = ex_code_batch
             return batch
 
     def batcher(self, shuffle=True):
-        self.__nl_vocab = self.__read_vocab(config.NL_VOCAB)
-        self.__ast_vocab = self.__read_vocab(config.AST_VOCAB)
-        self.__code_vocab = self.__read_vocab(config.CODE_VOCAB)
-
-        self.__nl_data = self.__read_data(config.paths[self.key]["NL_INPUT"])
-        self.__ast_data = self.__read_data(config.paths[self.key]["AST_INPUT"])
-        self.__code_data = self.__read_data(config.paths[self.key]["CODE_INPUT"])
         
         print(f"[INFO] Steps per epoch: {len(self.__code_data)//self.batch_sz}")
 

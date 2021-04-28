@@ -1,7 +1,7 @@
 import tensorflow as tf
 from tensorflow.keras.models import Model
 from tensorflow_addons.activations import mish
-from tensorflow.nn import sigmoid, tanh, softmax, relu
+from tensorflow.nn import sigmoid, tanh, softmax
 from tensorflow.keras.layers import LSTM, Dense, Embedding, Layer, Bidirectional
 
 
@@ -16,7 +16,7 @@ class BiEncoder(Model):
         super(BiEncoder, self).__init__()
 
         self.embedding = Embedding(input_dim=inp_dim, 
-                                   output_dim=embed_dim)
+                                   output_dim=embed_dim,mask_zero=True)
         self.lstm = LSTM(enc_units, 
                          return_state=True, 
                          return_sequences=True)
@@ -101,7 +101,7 @@ class AttentionDecoder(Model):
         '''
         super(AttentionDecoder, self).__init__()
         self.attention = BahdanauAttention(attn_sz=dec_units)
-        self.embedding = Embedding(inp_dim, embed_dim)
+        self.embedding = Embedding(inp_dim, embed_dim,mask_zero=True)
         self.lstm = LSTM(dec_units, 
                          return_state=True,
                          return_sequences=True) 

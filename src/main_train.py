@@ -21,6 +21,8 @@ parser.add_argument("-log", "--logging", type=int, dest="logging",
 parser.add_argument("-la", "--look-ahead", dest="la", action="store_true")
 parser.add_argument("-ckpt", "--check-point-after", dest="ckpt", type=int,
                     default=0, help="check point the model after these many batches")
+parser.add_argument("-cov", "--coverage", type=float, 
+                    default=1.0, help="set coverage lambda parameter")
 args = parser.parse_args()
 
 
@@ -57,6 +59,7 @@ model_trainer = Trainer(encoder=encoder,
                         batch_sz=args.bs,
                         epochs=args.epochs,
                         logging=args.logging,
-                        ckpt=args.ckpt)
+                        ckpt=args.ckpt,
+                        cov=args.coverage)
 
 model_trainer.train()
