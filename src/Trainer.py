@@ -17,33 +17,32 @@ class Trainer:
                                               step=tf.Variable(0), 
                                               optimizer=self.optimizer)
 
-    def __train_step(self, code, code_ext, ast, target, max_oovs):
+    def __train_step(self, batch):
         with tf.GradientTape() as tape:
             total_loss, coverage = 0, None
-            hidden, state_h, state_c = self.encoder(code, ast)
+            hidden, state_h, state_c = self.encoder(batch.code, batch.ast)
             # initially feed in batch_sz tensor of start tokens <S>
             # for us start token is always first word in the vocab
             dec_input = tf.expand_dims([1] * self.batch_sz, axis=1)
             
             step_losses = []
-            for i in range(1, target.shape[1]):
+            for i in range(1, batch.nl.shape[1]):
                 final_dist, attn_dist, state_h, state_c, coverage = self.decoder(dec_input, hidden,
                                                                                  prev_h=state_h,
                                                                                  prev_c=state_c,
                                                                                  coverage=coverage,
-                                                                                 max_oovs=max_oovs,
-                                                                                 inp_code_ext=code_ext)
+                                                                                 max_oovs=batch.max_oovs,
+                                                                                 code_ext=batch.code_ex)
                                                                                      
-                actual_word = tf.expand_dims(target[:,i], axis=1) #teacher forcing
+                actual_word = tf.expand_dims(batch.nl[:,i], axis=1) #teacher forcing
                 gold_probs = tf.squeeze(tf.gather_nd(final_dist, actual_word, batch_dims=1))
                 cov_loss = tf.reduce_sum(tf.minimum(coverage, attn_dist), axis=1)
                 step_loss = -tf.math.log(gold_probs + 1e-12) + cov_loss
                 step_losses.append(step_loss)
-                # output at t-1 timestep is input for t timestep
                 dec_input = actual_word
                 
             sum_losses = tf.reduce_sum(tf.stack(step_losses, axis=1), axis=1)
-            batch_avg_loss = sum_losses/target.shape[1]
+            batch_avg_loss = sum_losses/batch.nl.shape[1]
             final_loss = tf.reduce_mean(batch_avg_loss)
                             
             variables = self.encoder.trainable_variables + \
@@ -60,21 +59,17 @@ class Trainer:
             print(f"[INFO] Running epoch: {epoch}")
             temp_batchqueue = self.batchqueue.batcher(self.batch_sz)
             for (nbatch, batch) in enumerate(temp_batchqueue):
-                loss = self.__train_step(batch.code, 
-                                         batch.code_ex, 
-                                         batch.ast, 
-                                         batch.nl, 
-                                         batch.max_oovs)
+                loss = self.__train_step(batch)
                 
                 if not epoch and not nbatch:
                     self.encoder.summary()
                     self.decoder.summary()
                 if not nbatch % self.logging:
                     out = "[INFO] Batch: {} | Loss: {:.2f}".format(nbatch, loss)
-                    with open("log.txt", 'a') as the_file:
+                    with open("my_log.txt", 'a') as the_file:
                         the_file.write(out + '\n')
                     print(out)
-                if not nbatch and not nbatch % self.ckpt_num:
+                if self.ckpt_num and nbatch and not nbatch % self.ckpt_num:
                     self.checkpoint.step.assign_add(self.ckpt_num)
                     self.store_checkpoint()
                     print(f"[INFO] Stored checkpoint for step {int(self.checkpoint.step)}")

@@ -112,7 +112,7 @@ class AttentionDecoder(Model):
         self.V2 = Dense(inp_dim)
         self.prev_context_vector = None
 
-    def call(self, x, h_i, prev_h, prev_c, coverage, max_oovs, inp_code_ext):
+    def call(self, x, h_i, prev_h, prev_c, coverage, max_oovs, code_ext):
         if self.prev_context_vector is None:
             context_vector, _, _ = self.attention(h_i, prev_h)
         else:
@@ -139,8 +139,8 @@ class AttentionDecoder(Model):
         concat_extra_zeros = tf.zeros((batch_sz, max_oovs))
         P1 = tf.concat([P1, concat_extra_zeros], axis=-1)
         batch_nums = tf.expand_dims(tf.range(0, batch_sz), 1)
-        batch_nums = tf.tile(batch_nums, [1, inp_code_ext.shape[1]])
-        indices = tf.stack((batch_nums, inp_code_ext), axis=2)
+        batch_nums = tf.tile(batch_nums, [1, code_ext.shape[1]])
+        indices = tf.stack((batch_nums, code_ext), axis=2)
         final_dist = P1 + tf.scatter_nd(indices, P2, [batch_sz, P1.shape[1]])
 
         return (final_dist, attn_dist, state_h, state_c, coverage)

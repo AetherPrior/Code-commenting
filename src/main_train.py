@@ -20,7 +20,7 @@ parser.add_argument("-log", "--logging", type=int, dest="logging",
                     default=100, help="log the loss after x batches")
 parser.add_argument("-la", "--look-ahead", dest="la", action="store_true")
 parser.add_argument("-ckpt", "--check-point-after", dest="ckpt", type=int,
-                    default=250, help="check point the model after these many batches")
+                    default=0, help="check point the model after these many batches")
 args = parser.parse_args()
 
 
