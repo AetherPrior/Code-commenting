@@ -76,7 +76,7 @@ class BatchQueue:
                     
             ast_batch = pad_sequences(ast_batch, maxlen=maxlen, padding="post")
             code_batch = pad_sequences(code_batch, maxlen=maxlen, padding="post")
-            ex_code_batch = pad_sequences(code_batch, maxlen=maxlen, padding="post")
+            ex_code_batch = pad_sequences(ex_code_batch, maxlen=maxlen, padding="post")
 
             batch = Batch()
             batch.oovs = oovs
