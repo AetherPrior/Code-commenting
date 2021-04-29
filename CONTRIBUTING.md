@@ -8,16 +8,18 @@ We love contributions and would be glad to help you make good patches. That out 
 4. Create a new feature branch with `git checkout -b my-feature`.
 5. Make your changes.
 6. Commit your changes (See [Guidelines](#commit-message-guidelines)).
-7. Rebase your commits with `upstream/master`:
+7. Rebase your commits with `upstream/main`:
 
-- `git checkout master`
-- `git fetch upstream master`
+- `git checkout main`
+- `git fetch upstream main`
 - `git reset --hard FETCH_HEAD`
 - `git checkout my-feature`
-- `git rebase master`
+- `git rebase main`
 
 8. Resolve any merge conflicts, and then push the branch with `git push origin my-feature`.
 9. Create a Pull Request detailing the changes you made and wait for review/merge.
+
+10. **IMPORTANT** We use the `alpha-testing branch` (formerly the `ridiculous-changes`) branch to add a feature, and we merge it with the `beta-testing` branch after it works. We merge with `main` ONLY once we need to demonstrate the model :) .
 
 It might seem a little complicated at a glance, but the fundamental concept is simple: we want to ensure that your changes are always made on top of the latest changes to the project and thus, we can easily merge your code. If you are facing any troubles, create a PR as you usually would and we would merge it manually. :)
 
