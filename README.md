@@ -26,6 +26,11 @@ The model can also substitute words with similar meanings:
 
 ![image](https://user-images.githubusercontent.com/39939017/116540912-68527900-a908-11eb-8494-b2769b46dd86.png)
 
+## BLEU Scoring and Loss plots
+
+![bleu](https://github.com/AetherPrior/Code-commenting/blob/beta-testing/Figure_2.png)  
+
+![loss](https://github.com/AetherPrior/Code-commenting/blob/beta-testing/Figure_1.png)  
 
 # Contributing
 - Please read [CONTRIBUTING.md](https://github.com/AetherPrior/Code-commenting/blob/main/CONTRIBUTING.md) for guidelines
