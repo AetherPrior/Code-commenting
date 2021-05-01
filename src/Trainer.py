@@ -1,8 +1,10 @@
 import sys
+import numpy as np
 import tensorflow as tf
 from os.path import exists
-import numpy as np
 from random import randint
+from tensorflow.train import Checkpoint
+from nltk.translate.bleu_score import sentence_bleu, SmoothingFunction
 
 
 class Trainer:
@@ -19,9 +21,8 @@ class Trainer:
         self.cov_lambda = cov
         self.checkpoint = tf.train.Checkpoint(encoder=self.encoder,
                                               decoder=self.decoder,
-                                              step=tf.Variable(0),
                                               optimizer=self.optimizer)
-        # self.nl_list = None
+                                              
 
     def __train_step(self, batch):
         with tf.GradientTape() as gtape:
@@ -57,58 +58,104 @@ class Trainer:
             final_loss = tf.reduce_mean(batch_avg_loss)
 
         variables = self.encoder.trainable_variables + \
-            self.decoder.trainable_variables
+                    self.decoder.trainable_variables
 
-        self.optimizer.minimize(final_loss, variables, tape=gtape)
+        grads = gtape.gradient(final_loss, variables)
+        self.optimizer.apply_gradients(zip(grads, variables))
         comment_batch = np.argmax(np.array(comment_batch), axis=2).T
-        # Ignore the first token from target
         return final_loss.numpy(), comment_batch, batch.nl[:, 1:]
 
+
     def train(self):
-        self.retrieve_checkpoint()
+        self.__retrieve_checkpoint()
         for epoch in range(self.epochs):
             print(f"[INFO] Running epoch: {epoch}")
             temp_batchqueue = self.batchqueue.batcher(self.batch_sz)
             self.nl_list = self.batchqueue.nl_list
+            
             for (nbatch, batch) in enumerate(temp_batchqueue):
                 loss, comment_batch, target_comment = self.__train_step(batch)
                 if not epoch and not nbatch:
                     self.encoder.summary()
                     self.decoder.summary()
                 if not nbatch % self.logging:
-                    print(f"[INFO] Batch: {nbatch} | Loss: {loss:.2f}")
-                    self.get_result(comment_batch, target_comment,
-                                    batch.code_oovs, i=randint(0, self.batch_sz-1))
+                    print(f"\n[INFO] Batch: {nbatch} | Loss: {loss:.2f}")
+                    self.__get_result(comment_batch, target_comment, batch.code_oovs)
                 if self.ckpt_num and nbatch and not nbatch % self.ckpt_num:
-                    self.checkpoint.step.assign_add(self.ckpt_num)
-                    self.store_checkpoint()
-                    print(
-                        f"[INFO] Stored checkpoint for step {int(self.checkpoint.step)}")
+                    self.checkpoint.write("./ckpts/ckpt")
+                    print("\n[INFO] Stored checkpoint\n")
 
-    def store_checkpoint(self):
-        self.checkpoint.write("./ckpts/ckpt")
 
-    def retrieve_checkpoint(self):
+    def __retrieve_checkpoint(self):
         if exists("./ckpts/ckpt.index"):
             try:
-                self.checkpoint.read("./ckpts/ckpt")
+                self.checkpoint.read("./ckpts/ckpt").expect_partial()
                 print("[INFO] Read Checkpoint")
             except:
                 print("[INFO] Failed reading Checkpoint, going with no checkpoint")
                 print(sys.exc_info()[0])
         else:
             print("[INFO] Starting from scratch")
+            
+    
+    def __trim_string(self, s):
+        trimmed = []
+        for w in s:
+            if w == "</S>" or w == "<PAD>":
+                break
+            trimmed.append(w)
+        if not len(trimmed):
+            trimmed.append("<PAD>")
+        return trimmed
 
-    def get_result(self, comment_batch, target_comment, oovs, i=0):
-        commentstring = ""
-        for word in comment_batch[i]:
-            if not word:
-                commentstring += "<PAD> "
-            elif word < 29999:
-                commentstring += f"{self.nl_list[word-1]} "
-            else:
-                commentstring += f"{oovs[word-29999]} "
 
-        print(commentstring)
-        print(" ".join(["<PAD>" if not j else self.nl_list[j-1]
-              for j in target_comment[i]]))
+    def __get_result(self, comment_batch, target_comment, oovs, print_batch=None):
+        """
+        BLEU Scoring
+        """
+        batch_len = len(comment_batch)
+        mean_BLEU_1, mean_BLEU_2, mean_BLEU_3, mean_BLEU_4 = 0, 0, 0, 0
+        
+        for comment in range(0, batch_len):
+            
+            comment_hat = []
+            target = ["<PAD>" if not j else self.nl_list[j-1] for j in target_comment[comment]]
+            
+            for word in comment_batch[comment]:
+                if not word:
+                    comment_hat.append("<PAD>")
+                elif word < 29999:
+                    comment_hat.append(self.nl_list[word-1])
+                else:
+                    comment_hat.append(oovs[word-29999])
+            
+            target = self.__trim_string(target)
+            comment_hat = self.__trim_string(comment_hat)
+            
+            if print_batch is not None and print_batch == comment:
+                print("Prediction:", " ".join(comment_hat))
+                print("Ground Truth:", " ".join(target))
+            
+            smoothie = SmoothingFunction().method4
+            mean_BLEU_1 += sentence_bleu([target], 
+                                         comment_hat, 
+                                         weights=(1, 0, 0, 0), 
+                                         smoothing_function=smoothie)
+            mean_BLEU_2 += sentence_bleu([target], 
+                                         comment_hat, 
+                                         weights=(0.5, 0.5, 0, 0),
+                                         smoothing_function=smoothie)
+            mean_BLEU_3 += sentence_bleu([target], 
+                                         comment_hat, 
+                                         weights=(0.33, 0.33, 0.33, 0),
+                                         smoothing_function=smoothie)
+            mean_BLEU_4 += sentence_bleu([target], 
+                                         comment_hat, 
+                                         weights=(0.25, 0.25, 0.25, 0.25),
+                                         smoothing_function=smoothie)
+            
+        print(f"Cumulative 1-gram: {mean_BLEU_1/batch_len}")
+        print(f"Cumulative 2-gram: {mean_BLEU_2/batch_len}")
+        print(f"Cumulative 3-gram: {mean_BLEU_3/batch_len}")
+        print(f"Cumulative 4-gram: {mean_BLEU_4/batch_len}")
+        

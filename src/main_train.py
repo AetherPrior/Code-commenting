@@ -52,6 +52,7 @@ if args.la:
     print("[INFO] Using LookAhead wrapper on optimizer")
     optim = Lookahead(optim)
 
+
 model_trainer = Trainer(encoder=encoder,
                         decoder=decoder,
                         optimizer=optim,
