@@ -9,6 +9,11 @@ vocab_size_code = 30000
 vocab_size_nl = 30000
 vocab_size_ast = 65
 
+PAD = 0
+BOS = 1
+EOS = 2
+UNK = 3
+
 paths = {
 
     "train": {
