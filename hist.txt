@@ -1,0 +1,916 @@
+[INFO] Batch: 0 | Loss: 5.55
+Cumulative 1-gram: 0.0
+Cumulative 2-gram: 0.0
+Cumulative 3-gram: 0.0
+Cumulative 4-gram: 0.0
+
+[INFO] Batch: 100 | Loss: 3.23
+Cumulative 1-gram: 0.11432855262271069
+Cumulative 2-gram: 0.11195872022192532
+Cumulative 3-gram: 0.10551661135285273
+Cumulative 4-gram: 0.09582286903990737
+
+[INFO] Batch: 200 | Loss: 3.26
+Cumulative 1-gram: 0.21308322889022338
+Cumulative 2-gram: 0.23464187273088308
+Cumulative 3-gram: 0.22997487839066688
+Cumulative 4-gram: 0.21197661067722226
+
+[INFO] Stored checkpoint
+
+
+[INFO] Batch: 300 | Loss: 3.20
+Cumulative 1-gram: 0.23592511468266436
+Cumulative 2-gram: 0.2246995121406383
+Cumulative 3-gram: 0.2234985166999284
+Cumulative 4-gram: 0.20836065758467384
+
+[INFO] Batch: 400 | Loss: 2.96
+Cumulative 1-gram: 0.24655350334581336
+Cumulative 2-gram: 0.2429195014698781
+Cumulative 3-gram: 0.23572996678899552
+Cumulative 4-gram: 0.2172533226473189
+
+[INFO] Batch: 500 | Loss: 3.04
+Cumulative 1-gram: 0.2520498538721891
+Cumulative 2-gram: 0.24724956470393408
+Cumulative 3-gram: 0.23770782186356437
+Cumulative 4-gram: 0.21956461402795072
+
+[INFO] Stored checkpoint
+
+
+[INFO] Batch: 600 | Loss: 2.87
+Cumulative 1-gram: 0.2702319713237664
+Cumulative 2-gram: 0.24096883582937373
+Cumulative 3-gram: 0.2324361390746797
+Cumulative 4-gram: 0.21417702180104495
+
+[INFO] Batch: 700 | Loss: 2.58
+Cumulative 1-gram: 0.30473022017539697
+Cumulative 2-gram: 0.26138512277481496
+Cumulative 3-gram: 0.24885621478658382
+Cumulative 4-gram: 0.22880706799415398
+
+[INFO] Stored checkpoint
+
+
+[INFO] Batch: 800 | Loss: 2.71
+Cumulative 1-gram: 0.28472414926240713
+Cumulative 2-gram: 0.24580740287619682
+Cumulative 3-gram: 0.23756633456476448
+Cumulative 4-gram: 0.21904629956997151
+
+[INFO] Batch: 900 | Loss: 2.46
+Cumulative 1-gram: 0.3080043797518767
+Cumulative 2-gram: 0.2619344238244604
+Cumulative 3-gram: 0.24888799859141023
+Cumulative 4-gram: 0.22757308030684226
+
+[INFO] Batch: 1000 | Loss: 2.50
+Cumulative 1-gram: 0.3186881966434671
+Cumulative 2-gram: 0.26616621425862447
+Cumulative 3-gram: 0.251842191346451
+Cumulative 4-gram: 0.2331497071409224
+
+[INFO] Stored checkpoint
+
+
+[INFO] Batch: 1100 | Loss: 2.72
+Cumulative 1-gram: 0.3103590853354733
+Cumulative 2-gram: 0.2615224349179829
+Cumulative 3-gram: 0.2451801693014947
+Cumulative 4-gram: 0.22675118309523098
+
+[INFO] Batch: 1200 | Loss: 2.72
+Cumulative 1-gram: 0.3301277511787222
+Cumulative 2-gram: 0.2875980022221594
+Cumulative 3-gram: 0.26976919488769013
+Cumulative 4-gram: 0.2448512785059362
+
+[INFO] Stored checkpoint
+
+
+[INFO] Batch: 1300 | Loss: 2.68
+Cumulative 1-gram: 0.3363005052368102
+Cumulative 2-gram: 0.28155543897806323
+Cumulative 3-gram: 0.2610557429841257
+Cumulative 4-gram: 0.2387458060425527
+
+[INFO] Batch: 1400 | Loss: 2.59
+Cumulative 1-gram: 0.377887482094578
+Cumulative 2-gram: 0.3039799429594958
+Cumulative 3-gram: 0.27874779948849904
+Cumulative 4-gram: 0.2549253723263989
+
+[INFO] Batch: 1500 | Loss: 2.69
+Cumulative 1-gram: 0.35264778917123646
+Cumulative 2-gram: 0.2752377169214457
+Cumulative 3-gram: 0.2579683863214782
+Cumulative 4-gram: 0.23808463841159733
+
+[INFO] Stored checkpoint
+
+
+[INFO] Batch: 1600 | Loss: 2.44
+Cumulative 1-gram: 0.3444532556760066
+Cumulative 2-gram: 0.295955346916307
+Cumulative 3-gram: 0.27351421789805297
+Cumulative 4-gram: 0.25069559347932596
+
+[INFO] Batch: 1700 | Loss: 2.70
+Cumulative 1-gram: 0.3660121488969085
+Cumulative 2-gram: 0.29039201520884894
+Cumulative 3-gram: 0.2643468277529523
+Cumulative 4-gram: 0.24508528874796118
+
+[INFO] Stored checkpoint
+
+
+[INFO] Batch: 1800 | Loss: 2.46
+Cumulative 1-gram: 0.39633788777729806
+Cumulative 2-gram: 0.33024593560940635
+Cumulative 3-gram: 0.3191472721632195
+Cumulative 4-gram: 0.29754150670991325
+
+[INFO] Batch: 1900 | Loss: 2.37
+Cumulative 1-gram: 0.36418929621668766
+Cumulative 2-gram: 0.3024830488272922
+Cumulative 3-gram: 0.2797004463645409
+Cumulative 4-gram: 0.25943340193431536
+
+[INFO] Batch: 2000 | Loss: 2.41
+Cumulative 1-gram: 0.3398436803550759
+Cumulative 2-gram: 0.28382572728452
+Cumulative 3-gram: 0.26315721093954
+Cumulative 4-gram: 0.24204175772105294
+
+[INFO] Stored checkpoint
+
+
+[INFO] Batch: 2100 | Loss: 2.41
+Cumulative 1-gram: 0.3608266363284367
+Cumulative 2-gram: 0.30814425094622955
+Cumulative 3-gram: 0.28496663502101416
+Cumulative 4-gram: 0.2631625194119278
+
+[INFO] Batch: 2200 | Loss: 2.41
+Cumulative 1-gram: 0.35133960655091595
+Cumulative 2-gram: 0.2885886745293081
+Cumulative 3-gram: 0.2692918097664296
+Cumulative 4-gram: 0.24607385846947255
+
+[INFO] Stored checkpoint
+
+
+[INFO] Batch: 2300 | Loss: 2.40
+Cumulative 1-gram: 0.43587355748200934
+Cumulative 2-gram: 0.3476520936382104
+Cumulative 3-gram: 0.32057500406831657
+Cumulative 4-gram: 0.29540500485280086
+
+[INFO] Batch: 2400 | Loss: 2.23
+Cumulative 1-gram: 0.4117042596649478
+Cumulative 2-gram: 0.3455831924851669
+Cumulative 3-gram: 0.3220617690844226
+Cumulative 4-gram: 0.2978835356537742
+
+[INFO] Batch: 2500 | Loss: 2.31
+Cumulative 1-gram: 0.45472958960610754
+Cumulative 2-gram: 0.3776964550728348
+Cumulative 3-gram: 0.3461296737597297
+Cumulative 4-gram: 0.31924166121537456
+
+[INFO] Stored checkpoint
+
+
+[INFO] Batch: 2600 | Loss: 2.40
+Cumulative 1-gram: 0.36024600322816075
+Cumulative 2-gram: 0.3053772992585921
+Cumulative 3-gram: 0.28621069434214297
+Cumulative 4-gram: 0.2637913309923
+
+[INFO] Batch: 2700 | Loss: 2.44
+Cumulative 1-gram: 0.3765524789856285
+Cumulative 2-gram: 0.3116718335900792
+Cumulative 3-gram: 0.28483803305367217
+Cumulative 4-gram: 0.25900976338997983
+
+[INFO] Stored checkpoint
+
+
+[INFO] Batch: 2800 | Loss: 2.37
+Cumulative 1-gram: 0.3890539115127504
+Cumulative 2-gram: 0.3358649471164084
+Cumulative 3-gram: 0.3083101744444486
+Cumulative 4-gram: 0.27989339628517884
+
+[INFO] Batch: 2900 | Loss: 2.37
+Cumulative 1-gram: 0.41870172678354534
+Cumulative 2-gram: 0.35221837264969286
+Cumulative 3-gram: 0.32408438642462445
+Cumulative 4-gram: 0.29544135490378226
+
+[INFO] Batch: 3000 | Loss: 2.22
+Cumulative 1-gram: 0.4334059774886398
+Cumulative 2-gram: 0.34482817911883173
+Cumulative 3-gram: 0.3163868549415633
+Cumulative 4-gram: 0.290267925662096
+
+[INFO] Stored checkpoint
+
+
+[INFO] Batch: 3100 | Loss: 2.34
+Cumulative 1-gram: 0.43850374705684425
+Cumulative 2-gram: 0.36502469088402817
+Cumulative 3-gram: 0.33463227465894146
+Cumulative 4-gram: 0.30446374034253887
+
+[INFO] Batch: 3200 | Loss: 2.49
+Cumulative 1-gram: 0.4347486185232707
+Cumulative 2-gram: 0.3571340645003073
+Cumulative 3-gram: 0.32316494133037343
+Cumulative 4-gram: 0.2932336990651471
+
+[INFO] Stored checkpoint
+
+
+[INFO] Batch: 3300 | Loss: 2.12
+Cumulative 1-gram: 0.4515155487412571
+Cumulative 2-gram: 0.37817740950245754
+Cumulative 3-gram: 0.35071546777130586
+Cumulative 4-gram: 0.32246983451409195
+
+[INFO] Batch: 3400 | Loss: 2.38
+Cumulative 1-gram: 0.4473668629256594
+Cumulative 2-gram: 0.3737182998573515
+Cumulative 3-gram: 0.342096381495193
+Cumulative 4-gram: 0.3103616333314999
+[INFO] Running epoch: 1
+
+[INFO] Batch: 0 | Loss: 2.26
+Cumulative 1-gram: 0.43309488899233217
+Cumulative 2-gram: 0.3454646618863299
+Cumulative 3-gram: 0.31382701137321767
+Cumulative 4-gram: 0.28620944870774184
+
+[INFO] Batch: 100 | Loss: 2.16
+Cumulative 1-gram: 0.4941403751194974
+Cumulative 2-gram: 0.401708113286319
+Cumulative 3-gram: 0.3743026200966121
+Cumulative 4-gram: 0.3463375095097491
+
+[INFO] Batch: 200 | Loss: 2.46
+Cumulative 1-gram: 0.4652836130366825
+Cumulative 2-gram: 0.3865453540313362
+Cumulative 3-gram: 0.35824226436759743
+Cumulative 4-gram: 0.3341847372116842
+
+[INFO] Stored checkpoint
+
+
+[INFO] Batch: 300 | Loss: 2.19
+Cumulative 1-gram: 0.45678985027242197
+Cumulative 2-gram: 0.38641754826623753
+Cumulative 3-gram: 0.35720101491864426
+Cumulative 4-gram: 0.32909126980944753
+
+[INFO] Batch: 400 | Loss: 2.17
+Cumulative 1-gram: 0.4684038921045252
+Cumulative 2-gram: 0.3925637469253998
+Cumulative 3-gram: 0.36466303627117386
+Cumulative 4-gram: 0.3397807677311554
+
+[INFO] Batch: 500 | Loss: 2.22
+Cumulative 1-gram: 0.4416417534256411
+Cumulative 2-gram: 0.3624369258859246
+Cumulative 3-gram: 0.32227221639233555
+Cumulative 4-gram: 0.29439199920583226
+
+[INFO] Stored checkpoint
+
+
+[INFO] Batch: 600 | Loss: 2.06
+Cumulative 1-gram: 0.4354497804631937
+Cumulative 2-gram: 0.3576617219197856
+Cumulative 3-gram: 0.327173341047728
+Cumulative 4-gram: 0.2989176730236497
+
+[INFO] Batch: 700 | Loss: 2.13
+Cumulative 1-gram: 0.427108625567347
+Cumulative 2-gram: 0.354134103308968
+Cumulative 3-gram: 0.32292315046442793
+Cumulative 4-gram: 0.2981052177869727
+
+[INFO] Stored checkpoint
+
+
+[INFO] Batch: 800 | Loss: 2.14
+Cumulative 1-gram: 0.4836439909706727
+Cumulative 2-gram: 0.39163979189189363
+Cumulative 3-gram: 0.35008736917832134
+Cumulative 4-gram: 0.31651498063147593
+
+[INFO] Batch: 900 | Loss: 2.14
+Cumulative 1-gram: 0.43604315397547516
+Cumulative 2-gram: 0.35649161875286856
+Cumulative 3-gram: 0.3222482290012973
+Cumulative 4-gram: 0.2926656801674111
+
+[INFO] Batch: 1000 | Loss: 2.31
+Cumulative 1-gram: 0.42720778349165694
+Cumulative 2-gram: 0.33896780126138554
+Cumulative 3-gram: 0.309201500234794
+Cumulative 4-gram: 0.28105408799649756
+
+[INFO] Stored checkpoint
+
+
+[INFO] Batch: 1100 | Loss: 2.10
+Cumulative 1-gram: 0.46005236967714236
+Cumulative 2-gram: 0.38075238055024
+Cumulative 3-gram: 0.35471081201000854
+Cumulative 4-gram: 0.3224010522339507
+
+[INFO] Batch: 1200 | Loss: 2.10
+Cumulative 1-gram: 0.4839883480554715
+Cumulative 2-gram: 0.40079003277512776
+Cumulative 3-gram: 0.36331173110496434
+Cumulative 4-gram: 0.33472019845426587
+
+[INFO] Stored checkpoint
+
+
+[INFO] Batch: 1300 | Loss: 2.36
+Cumulative 1-gram: 0.4215263546922415
+Cumulative 2-gram: 0.3519694856358323
+Cumulative 3-gram: 0.3188051852362263
+Cumulative 4-gram: 0.29195977860249867
+
+[INFO] Batch: 1400 | Loss: 2.19
+Cumulative 1-gram: 0.4858661622732484
+Cumulative 2-gram: 0.4090899221237509
+Cumulative 3-gram: 0.3775947492693301
+Cumulative 4-gram: 0.3509443000239198
+
+[INFO] Batch: 1500 | Loss: 2.21
+Cumulative 1-gram: 0.5156171817525683
+Cumulative 2-gram: 0.4268030453228759
+Cumulative 3-gram: 0.3965755041792953
+Cumulative 4-gram: 0.36314225062068867
+
+[INFO] Stored checkpoint
+
+
+[INFO] Batch: 1600 | Loss: 2.18
+Cumulative 1-gram: 0.48320594136967004
+Cumulative 2-gram: 0.4207219933805227
+Cumulative 3-gram: 0.38475722734318235
+Cumulative 4-gram: 0.35502406063793684
+
+[INFO] Batch: 1700 | Loss: 2.38
+Cumulative 1-gram: 0.47229403303452405
+Cumulative 2-gram: 0.41179415205255226
+Cumulative 3-gram: 0.37674003914842286
+Cumulative 4-gram: 0.34735638718471085
+
+[INFO] Stored checkpoint
+
+
+[INFO] Batch: 1800 | Loss: 2.32
+Cumulative 1-gram: 0.43279777014135806
+Cumulative 2-gram: 0.3548113168090319
+Cumulative 3-gram: 0.3201326663455018
+Cumulative 4-gram: 0.2917759325027595
+
+[INFO] Batch: 1900 | Loss: 2.14
+Cumulative 1-gram: 0.4460182502972112
+Cumulative 2-gram: 0.36757110472499344
+Cumulative 3-gram: 0.33437260105166866
+Cumulative 4-gram: 0.3076063628577088
+
+[INFO] Batch: 2000 | Loss: 2.28
+Cumulative 1-gram: 0.44703447260696555
+Cumulative 2-gram: 0.36598183068978535
+Cumulative 3-gram: 0.3376117473215748
+Cumulative 4-gram: 0.31017321804046505
+
+[INFO] Stored checkpoint
+
+
+[INFO] Batch: 2100 | Loss: 2.15
+Cumulative 1-gram: 0.48511669381445927
+Cumulative 2-gram: 0.3992721578876491
+Cumulative 3-gram: 0.3558184694959305
+Cumulative 4-gram: 0.32338017585595036
+
+[INFO] Batch: 2200 | Loss: 2.15
+Cumulative 1-gram: 0.4929424330816849
+Cumulative 2-gram: 0.4197272025518636
+Cumulative 3-gram: 0.38276405672347474
+Cumulative 4-gram: 0.3506654024285101
+
+[INFO] Stored checkpoint
+
+
+[INFO] Batch: 2300 | Loss: 2.12
+Cumulative 1-gram: 0.47525921380318625
+Cumulative 2-gram: 0.39149889809569305
+Cumulative 3-gram: 0.35848174925369886
+Cumulative 4-gram: 0.330183717384007
+
+[INFO] Batch: 2400 | Loss: 2.20
+Cumulative 1-gram: 0.4868559358696623
+Cumulative 2-gram: 0.39601216901579744
+Cumulative 3-gram: 0.35292846946790685
+Cumulative 4-gram: 0.318812864964043
+
+[INFO] Batch: 2500 | Loss: 2.03
+Cumulative 1-gram: 0.49666614957221444
+Cumulative 2-gram: 0.42141917367122894
+Cumulative 3-gram: 0.391775959349974
+Cumulative 4-gram: 0.3659607259859871
+
+[INFO] Stored checkpoint
+
+
+[INFO] Batch: 2600 | Loss: 2.23
+Cumulative 1-gram: 0.5183617610527614
+Cumulative 2-gram: 0.42951528739349154
+Cumulative 3-gram: 0.39178919848021593
+Cumulative 4-gram: 0.3614933071848726
+
+[INFO] Batch: 2700 | Loss: 2.11
+Cumulative 1-gram: 0.5065492424609719
+Cumulative 2-gram: 0.4148887391371118
+Cumulative 3-gram: 0.3814919140705194
+Cumulative 4-gram: 0.34847573085038
+
+[INFO] Stored checkpoint
+
+
+[INFO] Batch: 2800 | Loss: 2.11
+Cumulative 1-gram: 0.51316865919073
+Cumulative 2-gram: 0.4280082341214056
+Cumulative 3-gram: 0.39284657295179465
+Cumulative 4-gram: 0.36447818010990035
+
+[INFO] Batch: 2900 | Loss: 2.12
+Cumulative 1-gram: 0.4425274154469945
+Cumulative 2-gram: 0.3559767399689894
+Cumulative 3-gram: 0.32536399431060486
+Cumulative 4-gram: 0.2983070306328027
+
+[INFO] Batch: 3000 | Loss: 2.14
+Cumulative 1-gram: 0.4929084967979643
+Cumulative 2-gram: 0.4122502768618738
+Cumulative 3-gram: 0.3777939202174104
+Cumulative 4-gram: 0.3527630975678782
+
+[INFO] Stored checkpoint
+
+
+[INFO] Batch: 3100 | Loss: 2.08
+Cumulative 1-gram: 0.4845146294034532
+Cumulative 2-gram: 0.40434391611069964
+Cumulative 3-gram: 0.37072504574779486
+Cumulative 4-gram: 0.3437232168751755
+
+[INFO] Batch: 3200 | Loss: 2.11
+Cumulative 1-gram: 0.46502639824880476
+Cumulative 2-gram: 0.39557776442588166
+Cumulative 3-gram: 0.36478089741428793
+Cumulative 4-gram: 0.33779337943857213
+
+[INFO] Stored checkpoint
+
+
+[INFO] Batch: 3300 | Loss: 1.96
+Cumulative 1-gram: 0.5037715679308922
+Cumulative 2-gram: 0.414098017739389
+Cumulative 3-gram: 0.37313903158386713
+Cumulative 4-gram: 0.3427471639589305
+
+[INFO] Batch: 3400 | Loss: 2.06
+Cumulative 1-gram: 0.5227469314344582
+Cumulative 2-gram: 0.42922934156555453
+Cumulative 3-gram: 0.3861765592835123
+Cumulative 4-gram: 0.3510072251735208
+[INFO] Running epoch: 2
+
+[INFO] Batch: 0 | Loss: 2.04
+Cumulative 1-gram: 0.49641125473299225
+Cumulative 2-gram: 0.41919996744046145
+Cumulative 3-gram: 0.37277681962672327
+Cumulative 4-gram: 0.3377221140323151
+
+[INFO] Batch: 100 | Loss: 2.18
+Cumulative 1-gram: 0.44225598406785366
+Cumulative 2-gram: 0.3598689144834607
+Cumulative 3-gram: 0.3314972182444264
+Cumulative 4-gram: 0.30464273572948936
+
+[INFO] Batch: 200 | Loss: 1.94
+Cumulative 1-gram: 0.5766846362066481
+Cumulative 2-gram: 0.49338533875471197
+Cumulative 3-gram: 0.46168511241280524
+Cumulative 4-gram: 0.43566611964180296
+
+[INFO] Stored checkpoint
+
+
+[INFO] Batch: 300 | Loss: 1.98
+Cumulative 1-gram: 0.4710644525985458
+Cumulative 2-gram: 0.37894889963587675
+Cumulative 3-gram: 0.34679246658179796
+Cumulative 4-gram: 0.3165956767709408
+
+[INFO] Batch: 400 | Loss: 2.06
+Cumulative 1-gram: 0.5214696174755448
+Cumulative 2-gram: 0.41620013160290775
+Cumulative 3-gram: 0.36848956017834744
+Cumulative 4-gram: 0.33439502039178903
+
+[INFO] Batch: 500 | Loss: 2.02
+Cumulative 1-gram: 0.5148196907499131
+Cumulative 2-gram: 0.4331979728040394
+Cumulative 3-gram: 0.38869742762457005
+Cumulative 4-gram: 0.3564642852802636
+
+[INFO] Stored checkpoint
+
+
+[INFO] Batch: 600 | Loss: 1.98
+Cumulative 1-gram: 0.49299548617331823
+Cumulative 2-gram: 0.4087731202349411
+Cumulative 3-gram: 0.376047941950529
+Cumulative 4-gram: 0.34621784354093793
+
+[INFO] Batch: 700 | Loss: 2.06
+Cumulative 1-gram: 0.47027626904790026
+Cumulative 2-gram: 0.39737252468321366
+Cumulative 3-gram: 0.3595631853171218
+Cumulative 4-gram: 0.32824284280887617
+
+[INFO] Stored checkpoint
+
+
+[INFO] Batch: 800 | Loss: 1.98
+Cumulative 1-gram: 0.5123012395866933
+Cumulative 2-gram: 0.4352514774445506
+Cumulative 3-gram: 0.3998192426866096
+Cumulative 4-gram: 0.3680107611631196
+
+[INFO] Batch: 900 | Loss: 1.91
+Cumulative 1-gram: 0.525352050342952
+Cumulative 2-gram: 0.43293731551450665
+Cumulative 3-gram: 0.394382621714825
+Cumulative 4-gram: 0.3564277991099059
+
+[INFO] Batch: 1000 | Loss: 1.96
+Cumulative 1-gram: 0.5038396183607956
+Cumulative 2-gram: 0.4214430125613936
+Cumulative 3-gram: 0.383465011036227
+Cumulative 4-gram: 0.35308929223091295
+
+[INFO] Stored checkpoint
+
+
+[INFO] Batch: 1100 | Loss: 1.89
+Cumulative 1-gram: 0.5529639546648689
+Cumulative 2-gram: 0.46177363770411056
+Cumulative 3-gram: 0.42286854092283505
+Cumulative 4-gram: 0.3901131444685966
+
+[INFO] Batch: 1200 | Loss: 2.02
+Cumulative 1-gram: 0.49469520015863855
+Cumulative 2-gram: 0.4097058877550981
+Cumulative 3-gram: 0.374157856266103
+Cumulative 4-gram: 0.3467438166719488
+
+[INFO] Stored checkpoint
+
+
+[INFO] Batch: 1300 | Loss: 1.90
+Cumulative 1-gram: 0.5481784305571571
+Cumulative 2-gram: 0.4716821941435176
+Cumulative 3-gram: 0.4322841280066857
+Cumulative 4-gram: 0.39667632537138503
+
+[INFO] Batch: 1400 | Loss: 2.11
+Cumulative 1-gram: 0.5087341617231953
+Cumulative 2-gram: 0.4205876847315232
+Cumulative 3-gram: 0.3879097667207925
+Cumulative 4-gram: 0.357759593890134
+
+[INFO] Batch: 1500 | Loss: 2.11
+Cumulative 1-gram: 0.5378321883343695
+Cumulative 2-gram: 0.4381629095558272
+Cumulative 3-gram: 0.3957614756109697
+Cumulative 4-gram: 0.36154640606294935
+
+[INFO] Stored checkpoint
+
+
+[INFO] Batch: 1600 | Loss: 2.01
+Cumulative 1-gram: 0.5138037811745267
+Cumulative 2-gram: 0.4291513540208165
+Cumulative 3-gram: 0.3941549703337268
+Cumulative 4-gram: 0.3645547223549129
+
+[INFO] Batch: 1700 | Loss: 1.94
+Cumulative 1-gram: 0.5474473530901576
+Cumulative 2-gram: 0.450527571905065
+Cumulative 3-gram: 0.405597062927935
+Cumulative 4-gram: 0.3710578499328966
+
+[INFO] Stored checkpoint
+
+
+[INFO] Batch: 1800 | Loss: 2.05
+Cumulative 1-gram: 0.49976342991390915
+Cumulative 2-gram: 0.40785232071642885
+Cumulative 3-gram: 0.3704568088763488
+Cumulative 4-gram: 0.33765149595524435
+
+[INFO] Batch: 1900 | Loss: 1.94
+Cumulative 1-gram: 0.5550389987900044
+Cumulative 2-gram: 0.4615098065171088
+Cumulative 3-gram: 0.4221627231820001
+Cumulative 4-gram: 0.385150286892153
+
+[INFO] Batch: 2000 | Loss: 2.03
+Cumulative 1-gram: 0.5138543243797651
+Cumulative 2-gram: 0.41397525128459967
+Cumulative 3-gram: 0.37955072763844655
+Cumulative 4-gram: 0.3448338310035498
+
+[INFO] Stored checkpoint
+
+
+[INFO] Batch: 2100 | Loss: 1.95
+Cumulative 1-gram: 0.5361894904481489
+Cumulative 2-gram: 0.4509745503894316
+Cumulative 3-gram: 0.4066859153763014
+Cumulative 4-gram: 0.3723926663425208
+
+[INFO] Batch: 2200 | Loss: 1.88
+Cumulative 1-gram: 0.5125401613870585
+Cumulative 2-gram: 0.42878757832575276
+Cumulative 3-gram: 0.39175042452197206
+Cumulative 4-gram: 0.35946664053598765
+
+[INFO] Stored checkpoint
+
+
+[INFO] Batch: 2300 | Loss: 2.01
+Cumulative 1-gram: 0.5227072334285482
+Cumulative 2-gram: 0.4367097172294962
+Cumulative 3-gram: 0.3894991181770103
+Cumulative 4-gram: 0.35591942363650303
+
+[INFO] Batch: 2400 | Loss: 2.08
+Cumulative 1-gram: 0.5041661344404237
+Cumulative 2-gram: 0.4176158106819431
+Cumulative 3-gram: 0.3837045810549738
+Cumulative 4-gram: 0.3532842873806442
+
+[INFO] Batch: 2500 | Loss: 2.10
+Cumulative 1-gram: 0.5156651082812757
+Cumulative 2-gram: 0.42211901260649426
+Cumulative 3-gram: 0.3791262082084914
+Cumulative 4-gram: 0.34403993143572764
+
+[INFO] Stored checkpoint
+
+
+[INFO] Batch: 2600 | Loss: 2.01
+Cumulative 1-gram: 0.5347752912343106
+Cumulative 2-gram: 0.43822653920308635
+Cumulative 3-gram: 0.3997213348020986
+Cumulative 4-gram: 0.37022433721469544
+
+[INFO] Batch: 2700 | Loss: 2.12
+Cumulative 1-gram: 0.50561522863359
+Cumulative 2-gram: 0.4150724105188485
+Cumulative 3-gram: 0.3672572477070402
+Cumulative 4-gram: 0.33229012115596945
+
+[INFO] Stored checkpoint
+
+
+[INFO] Batch: 2800 | Loss: 2.01
+Cumulative 1-gram: 0.49155787929937733
+Cumulative 2-gram: 0.4229485587089797
+Cumulative 3-gram: 0.39005186510466655
+Cumulative 4-gram: 0.3594730046607064
+
+[INFO] Batch: 2900 | Loss: 1.89
+Cumulative 1-gram: 0.5240646156587333
+Cumulative 2-gram: 0.4559585905771969
+Cumulative 3-gram: 0.4190540735758785
+Cumulative 4-gram: 0.3898371943744597
+
+[INFO] Batch: 3000 | Loss: 1.93
+Cumulative 1-gram: 0.5215155476197039
+Cumulative 2-gram: 0.4373546621983548
+Cumulative 3-gram: 0.397501597828935
+Cumulative 4-gram: 0.3574256585081065
+
+[INFO] Stored checkpoint
+
+
+[INFO] Batch: 3100 | Loss: 2.11
+Cumulative 1-gram: 0.4975607966058037
+Cumulative 2-gram: 0.4066537131818652
+Cumulative 3-gram: 0.3695182545950013
+Cumulative 4-gram: 0.34055125950375825
+
+[INFO] Batch: 3200 | Loss: 1.91
+Cumulative 1-gram: 0.5343819413441192
+Cumulative 2-gram: 0.45405089307572155
+Cumulative 3-gram: 0.41046248182831174
+Cumulative 4-gram: 0.37432955422780256
+
+[INFO] Stored checkpoint
+
+
+[INFO] Batch: 3300 | Loss: 1.97
+Cumulative 1-gram: 0.5149242798988344
+Cumulative 2-gram: 0.4330696123710997
+Cumulative 3-gram: 0.3994711364005907
+Cumulative 4-gram: 0.36766015417557363
+
+[INFO] Batch: 3400 | Loss: 1.98
+Cumulative 1-gram: 0.5082840899379366
+Cumulative 2-gram: 0.4146962391005195
+Cumulative 3-gram: 0.37789053858523847
+Cumulative 4-gram: 0.34680642109978205
+[INFO] Running epoch: 3
+
+[INFO] Batch: 0 | Loss: 2.02
+Cumulative 1-gram: 0.5223889900670983
+Cumulative 2-gram: 0.4473442355765634
+Cumulative 3-gram: 0.40549436074368006
+Cumulative 4-gram: 0.37193213700055844
+
+[INFO] Batch: 100 | Loss: 1.96
+Cumulative 1-gram: 0.5409007817477912
+Cumulative 2-gram: 0.44869514097234053
+Cumulative 3-gram: 0.40566473186372115
+Cumulative 4-gram: 0.3681180167495878
+
+[INFO] Batch: 200 | Loss: 1.80
+Cumulative 1-gram: 0.5681515709894628
+Cumulative 2-gram: 0.47945056017709714
+Cumulative 3-gram: 0.44276916655166926
+Cumulative 4-gram: 0.40972240527020426
+
+[INFO] Stored checkpoint
+
+
+[INFO] Batch: 300 | Loss: 1.84
+Cumulative 1-gram: 0.5579892329168252
+Cumulative 2-gram: 0.4630948110893162
+Cumulative 3-gram: 0.4130976009797524
+Cumulative 4-gram: 0.373167478650731
+
+[INFO] Batch: 400 | Loss: 1.83
+Cumulative 1-gram: 0.5523018156993361
+Cumulative 2-gram: 0.4490750953823254
+Cumulative 3-gram: 0.4056903298511089
+Cumulative 4-gram: 0.3684365500563594
+
+[INFO] Batch: 500 | Loss: 1.89
+Cumulative 1-gram: 0.553794257324927
+Cumulative 2-gram: 0.44636236906978344
+Cumulative 3-gram: 0.40028678450874344
+Cumulative 4-gram: 0.3638505232962381
+
+[INFO] Stored checkpoint
+
+
+[INFO] Batch: 600 | Loss: 1.79
+Cumulative 1-gram: 0.5681011891947108
+Cumulative 2-gram: 0.4736982883365874
+Cumulative 3-gram: 0.4333189582732928
+Cumulative 4-gram: 0.3982085337577019
+
+[INFO] Batch: 700 | Loss: 1.99
+Cumulative 1-gram: 0.5502532815404328
+Cumulative 2-gram: 0.4608213049576063
+Cumulative 3-gram: 0.41853961865905703
+Cumulative 4-gram: 0.380589616562997
+
+[INFO] Stored checkpoint
+
+
+[INFO] Batch: 800 | Loss: 1.98
+Cumulative 1-gram: 0.5427239762420903
+Cumulative 2-gram: 0.46115371237774405
+Cumulative 3-gram: 0.4224113812104393
+Cumulative 4-gram: 0.3898316646781437
+
+[INFO] Batch: 900 | Loss: 1.96
+Cumulative 1-gram: 0.5636893263689011
+Cumulative 2-gram: 0.47406922646402105
+Cumulative 3-gram: 0.4307580776320473
+Cumulative 4-gram: 0.3983353409670074
+
+[INFO] Batch: 1000 | Loss: 1.98
+Cumulative 1-gram: 0.5459930502689386
+Cumulative 2-gram: 0.45748288525568953
+Cumulative 3-gram: 0.4178232662628708
+Cumulative 4-gram: 0.388470479860614
+
+[INFO] Stored checkpoint
+
+
+[INFO] Batch: 1100 | Loss: 1.90
+Cumulative 1-gram: 0.5346428183389641
+Cumulative 2-gram: 0.43936093533593734
+Cumulative 3-gram: 0.38866279504194295
+Cumulative 4-gram: 0.35276659446324937
+
+[INFO] Batch: 1200 | Loss: 1.94
+Cumulative 1-gram: 0.5449093730800942
+Cumulative 2-gram: 0.45538115334158097
+Cumulative 3-gram: 0.41111742792039574
+Cumulative 4-gram: 0.3762623821935898
+
+[INFO] Stored checkpoint
+
+
+[INFO] Batch: 1300 | Loss: 1.91
+Cumulative 1-gram: 0.5525510651989908
+Cumulative 2-gram: 0.4641829714651473
+Cumulative 3-gram: 0.42210168530230374
+Cumulative 4-gram: 0.3870425533890383
+
+[INFO] Batch: 1400 | Loss: 1.96
+Cumulative 1-gram: 0.4944027010401951
+Cumulative 2-gram: 0.39809611808978795
+Cumulative 3-gram: 0.3531011009161077
+Cumulative 4-gram: 0.3161169374021909
+
+[INFO] Batch: 1500 | Loss: 1.91
+Cumulative 1-gram: 0.580500750945962
+Cumulative 2-gram: 0.4889165979526986
+Cumulative 3-gram: 0.44211915873321433
+Cumulative 4-gram: 0.4018051026438449
+
+[INFO] Stored checkpoint
+
+
+[INFO] Batch: 1600 | Loss: 2.05
+Cumulative 1-gram: 0.5248331564614461
+Cumulative 2-gram: 0.44574697077615355
+Cumulative 3-gram: 0.40673691320669386
+Cumulative 4-gram: 0.3766502886307104
+
+[INFO] Batch: 1700 | Loss: 1.89
+Cumulative 1-gram: 0.5669811064668483
+Cumulative 2-gram: 0.48156101878834784
+Cumulative 3-gram: 0.4383435135943221
+Cumulative 4-gram: 0.4030014664648273
+
+[INFO] Stored checkpoint
+
+
+[INFO] Batch: 1800 | Loss: 1.94
+Cumulative 1-gram: 0.5423051161048544
+Cumulative 2-gram: 0.45854137864223754
+Cumulative 3-gram: 0.41862806372929445
+Cumulative 4-gram: 0.3855910203976666
+
+[INFO] Batch: 1900 | Loss: 1.90
+Cumulative 1-gram: 0.5248821015530041
+Cumulative 2-gram: 0.4485815358051565
+Cumulative 3-gram: 0.41487063850142386
+Cumulative 4-gram: 0.3836338356940385
+
+[INFO] Batch: 2000 | Loss: 1.88
+Cumulative 1-gram: 0.5454704914030615
+Cumulative 2-gram: 0.4614367152086638
+Cumulative 3-gram: 0.42736771374661203
+Cumulative 4-gram: 0.39843607958088056
+
+[INFO] Stored checkpoint
+
+
+[INFO] Batch: 2100 | Loss: 1.88
+Cumulative 1-gram: 0.5244590331995459
+Cumulative 2-gram: 0.432057602649363
+Cumulative 3-gram: 0.3931712580053676
+Cumulative 4-gram: 0.35940376478603187
+
+[INFO] Batch: 2200 | Loss: 1.77
+Cumulative 1-gram: 0.5707625554830077
+Cumulative 2-gram: 0.48400860987197797
+Cumulative 3-gram: 0.43389695506338194
+Cumulative 4-gram: 0.39499376751183296
+
+[INFO] Stored checkpoint
+
+*-------------------------------------------------------------------------*
+
