@@ -1,7 +1,6 @@
 import torch
 import config
 import argparse
-import torch
 from UtilClasses import Trainer
 from DataWorks import BatchQueue
 from torch_optimizer import Ranger
@@ -11,11 +10,11 @@ from Models import DeepComEncoder, AttentionDecoder
 device = torch.device("cuda" if is_available() else "cpu")
 
 parser = argparse.ArgumentParser(description="Run the Model")
-parser.add_argument("-b", "--batch-size", type=int, default=128, help="Batch size for the model")
-parser.add_argument("-e", "--epochs", type=int, default=10, help="Number of epochs for the model")
-parser.add_argument("-lr", "--learning-rate", type=float, default=0.015, help="learning rate for the model")
-parser.add_argument("-log", "--logging", type=int, default=100, help="log the loss after `X` batches")
-parser.add_argument("-ckpt", "--check-point-after", type=int, default=0, help="check point the model after `X` batches")
+parser.add_argument("-b", "--batch-size", type=int, default=256, help="Batch size for the model")
+parser.add_argument("-e", "--epochs", type=int, default=50, help="Number of epochs for the model")
+parser.add_argument("-lr", "--learning-rate", type=float, default=0.01, help="learning rate for the model")
+parser.add_argument("-log", "--logging", type=int, default=1, help="log the loss after `X` batches")
+parser.add_argument("-ckpt", "--check-point-after", type=int, default=1700, help="check point the model after `X` batches")
 parser.add_argument("-cov", "--coverage", type=float, default=1.0, help="set coverage lambda parameter")
 args = parser.parse_args()
                                       
@@ -28,7 +27,7 @@ decoder = AttentionDecoder(inp_dim=config.vocab_size_nl+1).to(device)
 
 params = list(encoder.parameters()) + list(decoder.parameters())
 optim = Ranger(params, lr=args.learning_rate, weight_decay=1e-5)
-sched = ExponentialLR(optim, gamma=0.95, last_epoch=-1)
+sched = ExponentialLR(optim, gamma=0.99, last_epoch=-1)
     
 model_trainer = Trainer(encoder=encoder,
                         decoder=decoder,

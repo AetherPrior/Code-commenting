@@ -209,8 +209,6 @@ class Tester:
             checkpoint = torch.load("torch_checkpoints/ckpt.pt")
             self.encoder.load_state_dict(checkpoint["encoder"])
             self.decoder.load_state_dict(checkpoint["decoder"])
-            self.optimizer.load_state_dict(checkpoint["optimizer"])
-            self.scheduler.load_state_dict(checkpoint["scheduler"])
             print("[INFO] Read checkpoint")
         except FileNotFoundError:
             print("[INFO] Starting from scratch")

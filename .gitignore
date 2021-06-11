@@ -131,3 +131,11 @@ dmypy.json
 data/ 
 Dataset/
 codecomment/
+src-torch/.vscode/
+test*.txt
+cleaned_logfile.txt
+full.ipynb
+new_training.txt
+tee.txt
+
+src-torch/torch_checkpoints

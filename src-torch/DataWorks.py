@@ -113,5 +113,6 @@ class BatchQueue:
         i, l = 0, len(self.__code_data)
         while i + self.batch_sz < l:
             j = i + self.batch_sz
-            yield self.__helper(i, j)
+            var = self.__helper(i, j)
+            yield var
             i = j
